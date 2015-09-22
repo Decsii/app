@@ -179,7 +179,6 @@ public class MessagingActivity extends ActionBarActivity {
                 .equalTo("fromid", tcps.myId)
                 .findAll();
 
-
         List<String> asd = new ArrayList<>();
         List<Integer> asd2 = new ArrayList<>();
         if (result.size() != 0) {

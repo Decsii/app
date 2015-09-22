@@ -40,6 +40,7 @@ public class FriendListActivity extends ActionBarActivity {
     private int currentView;
     private Handler messageHandler = new MessageHandler();
     private String[] menuItems;
+    private FriendListAdapter fla;
 
     public class MessageHandler extends Handler {
         @Override
@@ -129,6 +130,8 @@ public class FriendListActivity extends ActionBarActivity {
         setContentView(R.layout.activity_friend_list);
 
         usersListView = (ListView) findViewById(R.id.usersListView);
+        fla = new FriendListAdapter(this);
+        usersListView.setAdapter(fla);
 
         Button btn = (Button) findViewById(R.id.frequestB);
         btn.setOnClickListener(requestB);
@@ -245,8 +248,14 @@ public class FriendListActivity extends ActionBarActivity {
     private void writeFriendList() {
         currentView = 0;
         friendList = tcps.getFriendsString();
-        namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.user_list_item, friendList);
-        usersListView.setAdapter(namesArrayAdapter);
+        //namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.user_list_item, friendList);
+        //usersListView.setAdapter(namesArrayAdapter);
+
+
+
+        for( String s : friendList ){
+            fla.addMessage(new FriendListItem("","","",""));
+        }
 
         usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1"
+    android:id="@+id/cardLayout"
+    android:baselineAligned="false">
+
+    <ImageView
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:src="@drawable/balazs"
+        android:id="@+id/imgView" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="75dp"
+        android:layout_weight="1"
+        android:id="@+id/msgLayout">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:gravity="center_vertical"
+            android:layout_height="45dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@+id/nameText"
+            android:layout_marginLeft="3dp"
+            android:textSize="20sp"
+            android:textColor="#000"/>
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:gravity="center_vertical"
+            android:layout_height="30dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_marginLeft="3dp"
+            android:id="@+id/lastMsgText"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:id="@+id/timeText"
+        android:text="Most" />
+</LinearLayout>
