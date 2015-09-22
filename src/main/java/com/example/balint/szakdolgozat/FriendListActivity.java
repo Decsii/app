@@ -51,37 +51,37 @@ public class FriendListActivity extends ActionBarActivity {
             switch (state) {
                 case 15:
                     writeFriendList();
-                break;
-                case 2 :
+                    break;
+                case 2:
                     intent = new Intent(FriendListActivity.this, MainActivity.class);
                     uz = "nomsg";
                     intent.putExtra(EXTRA_MESSAGE, uz);
                     startActivity(intent);
                     break;
                 case 4:
-                    toast = Toast.makeText(FriendListActivity.this, "Felkérés elfogadva",  Toast.LENGTH_SHORT);
+                    toast = Toast.makeText(FriendListActivity.this, "Felkérés elfogadva", Toast.LENGTH_SHORT);
                     toast.show();
                     writeRequests();
                     break;
                 case 5:
-                    toast = Toast.makeText(FriendListActivity.this, "Felkérés visszavonva",  Toast.LENGTH_SHORT);
+                    toast = Toast.makeText(FriendListActivity.this, "Felkérés visszavonva", Toast.LENGTH_SHORT);
                     toast.show();
                     writeSended();
                     break;
                 case 6:
-                    toast = Toast.makeText(FriendListActivity.this, "Felkérés visszautasitva",  Toast.LENGTH_SHORT);
+                    toast = Toast.makeText(FriendListActivity.this, "Felkérés visszautasitva", Toast.LENGTH_SHORT);
                     toast.show();
                     writeRequests();
                     break;
                 case 7:
-                    toast = Toast.makeText(FriendListActivity.this, "Barát hozzáadva",  Toast.LENGTH_SHORT);
+                    toast = Toast.makeText(FriendListActivity.this, "Barát hozzáadva", Toast.LENGTH_SHORT);
                     toast.show();
                     writeSended();
                     break;
                 case 16:
                     writeFriendList();
                     break;
-                case 900 :
+                case 900:
                     intent = new Intent(FriendListActivity.this, MessagingActivity.class);
                     uz = "nomsg";
                     intent.putExtra(EXTRA_MESSAGE, uz);
@@ -128,7 +128,7 @@ public class FriendListActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_list);
 
-        usersListView = (ListView)findViewById(R.id.usersListView);
+        usersListView = (ListView) findViewById(R.id.usersListView);
 
         Button btn = (Button) findViewById(R.id.frequestB);
         btn.setOnClickListener(requestB);
@@ -146,25 +146,25 @@ public class FriendListActivity extends ActionBarActivity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         Log.d("éppen", "most");
-        if ( v.getId() == R.id.usersListView ) {
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+        if (v.getId() == R.id.usersListView) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
             menu.setHeaderTitle("Balazs lenni homi");
 
-            switch(currentView){
+            switch (currentView) {
                 case 0:
-                    menuItems = new String[]{"Törlés","Kolbasz","Lovacska"};
+                    menuItems = new String[]{"Törlés", "Kolbasz", "Lovacska"};
                     break;
                 case 1:
-                    menuItems = new String[]{"Visszautasitás","Kolbasz","Lovacska"};
+                    menuItems = new String[]{"Visszautasitás", "Kolbasz", "Lovacska"};
                     break;
                 case 2:
-                    menuItems = new String[]{"DicsakBuksi","Kolbasz","Lovacska"};
+                    menuItems = new String[]{"DicsakBuksi", "Kolbasz", "Lovacska"};
                     break;
                 default:
-                    menuItems = new String[]{"DicsakBuksi","Kolbasz","Lovacska"};
+                    menuItems = new String[]{"DicsakBuksi", "Kolbasz", "Lovacska"};
                     break;
             }
-            for (int i = 0; i<menuItems.length; i++) {
+            for (int i = 0; i < menuItems.length; i++) {
                 menu.add(Menu.NONE, i, i, menuItems[i]);
             }
         }
@@ -172,10 +172,10 @@ public class FriendListActivity extends ActionBarActivity {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int menuItemIndex = item.getItemId();
         String listItemName;
-        switch (menuItems[menuItemIndex]){
+        switch (menuItems[menuItemIndex]) {
             case "Törlés":
                 listItemName = friendList.get(info.position);
                 tcps.deleteFriend(listItemName);
@@ -218,41 +218,41 @@ public class FriendListActivity extends ActionBarActivity {
     }
 
     private View.OnClickListener requestB = new View.OnClickListener() {
-        public void onClick(View v){
+        public void onClick(View v) {
             writeRequests();
         }
     };
 
     private View.OnClickListener writeFriendListB = new View.OnClickListener() {
-        public void onClick(View v){
+        public void onClick(View v) {
             writeFriendList();
         }
     };
 
     private View.OnClickListener addFriend = new View.OnClickListener() {
-        public void onClick(View v){
-            EditText et =  (EditText) findViewById(R.id.addFriendT);
-            tcps.addFriend( et.getText().toString() );
+        public void onClick(View v) {
+            EditText et = (EditText) findViewById(R.id.addFriendT);
+            tcps.addFriend(et.getText().toString());
         }
     };
 
     private View.OnClickListener writeSendedB = new View.OnClickListener() {
-        public void onClick(View v){
+        public void onClick(View v) {
             writeSended();
         }
     };
 
-    private void writeFriendList(){
+    private void writeFriendList() {
         currentView = 0;
         friendList = tcps.getFriendsString();
-        namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.user_list_item, friendList);
+        namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.user_list_item, friendList);
         usersListView.setAdapter(namesArrayAdapter);
 
         usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int i, long l) {
                 Log.d(friendList.get(i), "" + i);
-                tcps.startConv( friendList.get(i) );
+                tcps.startConv(friendList.get(i));
             }
         });
 
@@ -260,16 +260,16 @@ public class FriendListActivity extends ActionBarActivity {
 
     }
 
-    private void writeRequests(){
+    private void writeRequests() {
         currentView = 1;
         requestList = tcps.getRequestsString();
-        namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.user_list_item, requestList);
+        namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.user_list_item, requestList);
         usersListView.setAdapter(namesArrayAdapter);
 
         usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int i, long l) {
-                tcps.acceptRequest( requestList.get(i) );
+                tcps.acceptRequest(requestList.get(i));
                 Log.d(requestList.get(i), "" + i);
             }
         });
@@ -278,16 +278,16 @@ public class FriendListActivity extends ActionBarActivity {
 
     }
 
-    private void writeSended(){
+    private void writeSended() {
         currentView = 2;
         sendedList = tcps.getSendedString();
-        namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.user_list_item, sendedList);
+        namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.user_list_item, sendedList);
         usersListView.setAdapter(namesArrayAdapter);
 
         usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int i, long l) {
-                tcps.undoRequest( sendedList.get(i) );
+                tcps.undoRequest(sendedList.get(i));
                 Log.d(sendedList.get(i), "" + i);
             }
         });
@@ -295,7 +295,7 @@ public class FriendListActivity extends ActionBarActivity {
         registerForContextMenu(usersListView);
     }
 
-    private void onServiceReady(){
+    private void onServiceReady() {
         mBound = true;
         Intent intent = new Intent(FriendListActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));

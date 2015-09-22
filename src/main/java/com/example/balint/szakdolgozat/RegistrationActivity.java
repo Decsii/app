@@ -42,7 +42,9 @@ public class RegistrationActivity extends ActionBarActivity {
 
     public Handler messageHandler = new MessageHandler();
 
-    /** Defines callbacks for service binding, passed to bindService() */
+    /**
+     * Defines callbacks for service binding, passed to bindService()
+     */
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -106,10 +108,10 @@ public class RegistrationActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void registration( View v ){
+    public void registration(View v) {
         EditText userName = (EditText) findViewById(R.id.ruserText);
         EditText pass = (EditText) findViewById(R.id.rpasswordText);
-        if ( userName.getText().toString() != "" && pass.getText().toString() != "" ){
+        if (userName.getText().toString() != "" && pass.getText().toString() != "") {
             tcps.registration(userName.getText().toString(), pass.getText().toString());
         }
     }

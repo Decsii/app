@@ -41,11 +41,13 @@ import java.util.Queue;
 import java.util.Random;
 
 import io.realm.Realm;
+import io.realm.RealmMigration;
+import io.realm.RealmResults;
 
 /**
  * Created by Balint on 2015.08.20..
  */
-public class TCPService  extends Service {
+public class TCPService extends Service {
 
     // Binder given to clients
     private final IBinder mBinder = new LocalBinder();
@@ -56,7 +58,7 @@ public class TCPService  extends Service {
     private DataInputStream dis;
 
     private boolean logedIn = false;
-    private int myId;
+    public int myId;
 
     private List<Friend> friendList = new ArrayList<>();
     private List<Friend> friendRequests = new ArrayList<>();
@@ -68,7 +70,7 @@ public class TCPService  extends Service {
     private int numOfSended = 0;
     private List<Friend> sendedRequests = new ArrayList<>();
 
-    List<Pair<String,Integer>> messagesList = new ArrayList<>();
+    List<Pair<String, Integer>> messagesList = new ArrayList<>();
 
     boolean friendS = false;
     int numOfFriends = 0;
@@ -109,59 +111,31 @@ public class TCPService  extends Service {
     }
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         startTCP();
-        /*
-        Thread thread = new Thread()
-        {
-            @Override
-            public void run() {
-                try {
-                    String ip = "79.143.178.118";
-                    int port = 6000;
-                    InetSocketAddress isa = new InetSocketAddress(ip,port);
-                    socket.connect(isa);
-                    dos = new DataOutputStream(socket.getOutputStream());
-                    dis = new DataInputStream(socket.getInputStream());
-                    while(true) {
-                        String str;
-                        while(true) {
-                            int length = dis.readInt();
-
-                            byte[] bytes = new byte[length];
-                            dis.read(bytes, 0, length);
-
-                            str = new String(bytes);
-                            if ( str != null ) {
-                                Log.d("server : ", str);
-                                try {
-                                    feldolgozas(str);
-                                }catch(JSONException e){
-                                    Log.d("HIBA: ", "JSONHIBA");
-                                    Log.d("myapp", Log.getStackTraceString(e));
-                                }
-                            }
-                        }
-                    }
-                 }catch(Exception e) {
-                    byebye = true;
-                    System.out.println("something went wrong");
-                    Log.d("myapp", Log.getStackTraceString(e));
-                }
-            }
-        };
-        thread.start();
-        */
+        //realm.beginTransaction();
+        //Test test = realm.createObject(Test.class);
+        //test.setMsg("rohadjmeg");
+        //test.setSor(0);
+        //test.setFrom("nevem");
+        //realm.commitTransaction();
+        //RealmResults<Test> result2 = realm.where(Test.class)
+        //        .equalTo("from", "nevem")
+        //        .or()
+        //        .equalTo("sor", 0)
+        //        .findAll();
+        //Log.d("",result2.toString());
+        //startTCP();
     }
 
-    public void startTCP(){
-        Thread t1 = new Thread(){
+    public void startTCP() {
+        Thread t1 = new Thread() {
             public void run() {
-                while(true) {
-                    try{
+                while (true) {
+                    try {
                         String ip = "79.143.178.118";
                         int port = 6000;
-                        InetSocketAddress isa = new InetSocketAddress(ip,port);
+                        InetSocketAddress isa = new InetSocketAddress(ip, port);
                         socket = new Socket();
                         socket.connect(isa);
                         dos = new DataOutputStream(socket.getOutputStream());
@@ -170,25 +144,25 @@ public class TCPService  extends Service {
                         Thread thread2 = new Thread() {
                             @Override
                             public void run() {
-                                while (true){
+                                while (true) {
                                     try {
                                         Thread.sleep(1000);
-                                    }catch (Exception e){
+                                    } catch (Exception e) {
                                         Log.d("", "INTERRUPTED");
                                     }
-                                    if(logedIn)receiveMsg(1);
+                                    //if(logedIn)receiveMsg(1);
                                 }
                             }
                         };
                         thread2.start();
-                        Log.d("","start tcp leááált");
+                        Log.d("", "start tcp leááált");
                         break;
-                    }catch(Exception e){
-                        try{
+                    } catch (Exception e) {
+                        try {
                             Thread.sleep(2000);
-                            Log.d("","újracsatlakozás");
-                        }catch (InterruptedException ex){
-                            Log.d("","váratlan hiba");
+                            Log.d("", "újracsatlakozás");
+                        } catch (InterruptedException ex) {
+                            Log.d("", "váratlan hiba");
                         }
                     }
                 }
@@ -197,26 +171,26 @@ public class TCPService  extends Service {
         t1.start();
     }
 
-    public void startCommunication(){
+    public void startCommunication() {
         Thread t1 = new Thread() {
             public void run() {
                 String str;
-                while(true) {
+                while (true) {
                     try {
                         int length = dis.readInt();
                         byte[] bytes = new byte[length];
                         dis.read(bytes, 0, length);
                         str = new String(bytes);
 
-                    }catch(IOException e){
+                    } catch (IOException e) {
                         startTCP();
-                        Log.d("","start communication leááált");
+                        Log.d("", "start communication leááált");
                         break;
                     }
                     Log.d("server : ", str);
                     try {
                         feldolgozas(str);
-                    }catch(JSONException e){
+                    } catch (JSONException e) {
                         //itt azé kéne valami figyelmeztetés hogy elrontódott a dolog
                         Log.d("HIBA: ", "JSONHIBA");
                         Log.d("myapp", Log.getStackTraceString(e));
@@ -227,12 +201,12 @@ public class TCPService  extends Service {
         t1.start();
     }
 
-    public void feldolgozas(String jsonString) throws JSONException{
+    public void feldolgozas(String jsonString) throws JSONException {
         JSONObject jsonRootObject = new JSONObject(jsonString);
         String type;
         try {
             type = jsonRootObject.get("type").toString();
-        }catch(JSONException e){
+        } catch (JSONException e) {
             type = "hiba";
         }
 
@@ -261,41 +235,41 @@ public class TCPService  extends Service {
                 case "3":
                     JSONObject jo2 = jsonRootObject.optJSONObject("userdata");
 
-                    if ( sendedR ){
-                        sendedRequests.get(numOfSended -1).setName( jo2.getString("username") );
-                        if ( sendedRequests.size() == numOfSended ){
+                    if (sendedR) {
+                        sendedRequests.get(numOfSended - 1).setName(jo2.getString("username"));
+                        if (sendedRequests.size() == numOfSended) {
                             //sendMessage(8);
                             numOfSended = 0;
                             sendedR = false;
-                        }else{
-                            userInfoByID( sendedRequests.get(numOfSended).getUserid() );
+                        } else {
+                            userInfoByID(sendedRequests.get(numOfSended).getUserid());
                             numOfSended++;
                         }
                     }
 
-                    if ( requestS ){
-                        friendRequests.get(numOfRequests -1).setName( jo2.getString("username") );
-                        if ( friendRequests.size() == numOfRequests ){
+                    if (requestS) {
+                        friendRequests.get(numOfRequests - 1).setName(jo2.getString("username"));
+                        if (friendRequests.size() == numOfRequests) {
                             //sendMessage(9);
                             requestS = false;
                             numOfRequests = 0;
                             sendedRequests();
-                        }else{
-                            userInfoByID( friendRequests.get(numOfRequests).getUserid() );
+                        } else {
+                            userInfoByID(friendRequests.get(numOfRequests).getUserid());
                             numOfRequests++;
                         }
                     }
 
-                    if ( friendS ){
+                    if (friendS) {
                         requestedyet = true;
-                        friendList.get(numOfFriends - 1).setName( jo2.getString("username") );
-                        if ( friendList.size() == numOfFriends ){
+                        friendList.get(numOfFriends - 1).setName(jo2.getString("username"));
+                        if (friendList.size() == numOfFriends) {
                             sendMessage(15);
                             friendS = false;
                             numOfFriends = 0;
                             requests();
-                        }else{
-                            userInfoByID( friendList.get(numOfFriends).getUserid() );
+                        } else {
+                            userInfoByID(friendList.get(numOfFriends).getUserid());
                             numOfFriends++;
                         }
                     }
@@ -311,7 +285,7 @@ public class TCPService  extends Service {
                     sendMessage(6);
                     break;
                 case "7":
-                    sendedRequests.add( new Friend(addFId, addFName) );
+                    sendedRequests.add(new Friend(addFId, addFName));
                     sendMessage(7);
                     break;
                 case "8":
@@ -322,25 +296,85 @@ public class TCPService  extends Service {
                     break;
                 case "10":
                     try {
-
+                        Realm realm = Realm.getInstance(this);
                         jArr = jsonRootObject.optJSONArray("messages");
-                        int kuldo = jArr.getJSONObject(0).getInt("from");
-                        if ( kuldo == currentPartner ){
-                            if ( timeS != jArr.getJSONObject(0).getDouble("t") ) {
-                                timeS = jArr.getJSONObject(0).getDouble("t");
-                                currUz = jArr.getJSONObject(0).getString("msg");
-                                messagesList.add(new Pair(currUz,0));
-                                sendMessage(10);
+                        for (int i = 0; i < jArr.length(); i++) {
+                            int kuldo = jArr.getJSONObject(i).getInt("from");
+                            //if (kuldo == currentPartner) {
+                            //if (timeS != jArr.getJSONObject(i).getDouble("t")) {
+                            Log.d("", "bejövü tüzenetet eltárolujk");
+                            timeS = jArr.getJSONObject(i).getDouble("t");
+                            currUz = jArr.getJSONObject(i).getString("msg");
+                            messagesList.add(new Pair(currUz, 0));
+
+                            RealmResults<Messages> result = realm.where(Messages.class)
+                                    .findAll();
+                            realm.beginTransaction();
+
+                            if (result.size() > 20) {
+                                long min = result.min("msgid").longValue();
+                                for (Messages msg : result) {
+                                    if (min == msg.getMsgid()) {
+                                        msg.removeFromRealm();
+                                        break;
+                                    }
+                                }
                             }
+
+                            Messages msg = realm.createObject(Messages.class);
+                            msg.setMsg(currUz);
+                            msg.setFromid(currentPartner);
+                            msg.setMsgid(jArr.getJSONObject(0).getInt("msgid"));
+                            msg.setT(timeS);
+
+                            realm.commitTransaction();
+                            //}
+                            //}
                         }
-                    }catch(Exception e){}
+                        sendMessage(10);
+                    } catch (Exception e) {
+                        Log.d("", "10 as error");
+                    }
                     break;
                 case "13":
-                    sendMessage(13);
+                    try {
+                        Realm realm = Realm.getInstance(this);
+
+                        jObj = jsonRootObject.optJSONObject("message");
+
+                        RealmResults<Messages> result = realm.where(Messages.class)
+                                .findAll();
+
+                        realm.beginTransaction();
+
+                        if (result.size() > 20) {
+                            long min = result.min("msgid").longValue();
+                            for (Messages msg : result) {
+                                if (min == msg.getMsgid()) {
+                                    msg.removeFromRealm();
+                                    break;
+                                }
+                            }
+                        }
+
+                        Messages msg = realm.createObject(Messages.class);
+                        msg.setMsg(jObj.getString("msg"));
+                        msg.setFromid(jObj.getInt("from"));
+                        msg.setMsgid(jObj.getInt("msgid"));
+                        msg.setT(jObj.getDouble("t"));
+
+                        realm.commitTransaction();
+
+                        Log.d("", "küldöt tüzenetet eltárolujk");
+                        sendMessage(13);
+                    } catch (Exception e) {
+                        Log.d("", "13 as error");
+                        Log.d("", Log.getStackTraceString(e));
+                    }
                     break;
                 case "14":
                     JSONObject jo = jsonRootObject.optJSONObject("userdata");
-                    if (sendAF){
+                    if (sendAF) {
                         addFName = jo.getString("username");
                         addFId = jo.getInt("id");
                         addFriend(jo.getInt("id"));
@@ -354,9 +388,9 @@ public class TCPService  extends Service {
                     sendMessage(16);
                     break;
             }
-        }else{
+        } else {
             String errorCode = jsonRootObject.get("code").toString();
-            switch(errorCode){
+            switch (errorCode) {
                 case "21":
                     sendMessage(1121);
                     break;
@@ -369,7 +403,7 @@ public class TCPService  extends Service {
 
     }
 
-    public void logOut(){
+    public void logOut() {
         try {
             byebye = true;
             requestedyet = false;
@@ -377,14 +411,14 @@ public class TCPService  extends Service {
             logedIn = false;
             socket.close();
             socket = null;
-        }catch (Exception e){
-            Log.d("","nem tudta bezárni a socketet");
+        } catch (Exception e) {
+            Log.d("", "nem tudta bezárni a socketet");
         }
     }
 
-    public void requestListHandler(JSONArray jsonArray){
+    public void requestListHandler(JSONArray jsonArray) {
         friendRequests.clear();
-        if (jsonArray.length() == 0){
+        if (jsonArray.length() == 0) {
             sendedRequests();
             return;
         }
@@ -392,193 +426,193 @@ public class TCPService  extends Service {
             requestS = true;
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject friendObject = jsonArray.getJSONObject(i);
-                friendRequests.add( new Friend( friendObject.getInt("requestor") ) );
+                friendRequests.add(new Friend(friendObject.getInt("requestor")));
             }
 
-            userInfoByID( friendRequests.get(numOfRequests).getUserid() );
+            userInfoByID(friendRequests.get(numOfRequests).getUserid());
             numOfRequests++;
-        }catch(Exception e){
-            Log.d("hiba : ", "requesthandle hiba"  );
+        } catch (Exception e) {
+            Log.d("hiba : ", "requesthandle hiba");
         }
     }
 
-    public void sendedHandler(JSONArray jsonArray){
+    public void sendedHandler(JSONArray jsonArray) {
         sendedRequests.clear();
-        if (jsonArray.length() == 0){
+        if (jsonArray.length() == 0) {
             return;
         }
         try {
             sendedR = true;
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject friendObject = jsonArray.getJSONObject(i);
-                sendedRequests.add( new Friend( friendObject.getInt("requested") ) );
+                sendedRequests.add(new Friend(friendObject.getInt("requested")));
             }
 
-            userInfoByID( sendedRequests.get(numOfSended).getUserid() );
+            userInfoByID(sendedRequests.get(numOfSended).getUserid());
             numOfSended++;
-        }catch(Exception e){
-            Log.d("hiba : ", "requesthandle hiba"  );
+        } catch (Exception e) {
+            Log.d("hiba : ", "requesthandle hiba");
         }
     }
 
-    public void friendListHandler(JSONArray jsonArray){
+    public void friendListHandler(JSONArray jsonArray) {
         friendList.clear();
         try {
-            if (jsonArray.length() == 0){
+            if (jsonArray.length() == 0) {
                 requests();
                 return;
             }
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject friendObject = jsonArray.getJSONObject(i);
                 if (friendObject.getInt("user1") == myId) {
-                    friendList.add( new Friend( friendObject.getInt("user2") ));
+                    friendList.add(new Friend(friendObject.getInt("user2")));
                 } else {
-                    friendList.add( new Friend( friendObject.getInt("user1") ));
+                    friendList.add(new Friend(friendObject.getInt("user1")));
                 }
             }
             friendS = true;
-            userInfoByID( friendList.get(numOfFriends).getUserid() );
+            userInfoByID(friendList.get(numOfFriends).getUserid());
             numOfFriends++;
-        }catch(Exception e){
-            Log.d("hiba : ", "friendlisthandler" + myId  );
+        } catch (Exception e) {
+            Log.d("hiba : ", "friendlisthandler" + myId);
         }
     }
 
-    public void logInHandler(){
+    public void logInHandler() {
         logedIn = true;
         sendMessage(1);
     }
 
-    public void logIn(String username, String pass){
-        String msg = "{\"type\":1, \"username\":\""+ username  +"\", \"pass\":\""+ pass + "\"}";
+    public void logIn(String username, String pass) {
+        String msg = "{\"type\":1, \"username\":\"" + username + "\", \"pass\":\"" + pass + "\"}";
         byte[] bytes = msg.getBytes();
         try {
             dos.writeInt(bytes.length);
             dos.write(bytes);
             dos.flush();
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            Log.d("hiba","login küldési hiba ");
+            Log.d("hiba", "login küldési hiba ");
         }
     }
 
-    public void registration(String username, String pass){
-        String msg = "{\"type\":0, \"username\":\""+ username  +"\", \"pass\":\""+ pass + "\"}";
+    public void registration(String username, String pass) {
+        String msg = "{\"type\":0, \"username\":\"" + username + "\", \"pass\":\"" + pass + "\"}";
         Log.d("kuld", msg);
         byte[] bytes = msg.getBytes();
         try {
             dos.writeInt(bytes.length);
             dos.write(bytes);
             dos.flush();
-        }catch (Exception e) {
-            Log.d("hiba","regist küldési hiba ");
+        } catch (Exception e) {
+            Log.d("hiba", "regist küldési hiba ");
         }
     }
 
-    public void addFriend(String username){
-        String msg = "{\"type\":14,\"username\":\""+ username  +"\"}";
+    public void addFriend(String username) {
+        String msg = "{\"type\":14,\"username\":\"" + username + "\"}";
         byte[] bytes = msg.getBytes();
         try {
             dos.writeInt(bytes.length);
             dos.write(bytes);
             dos.flush();
             sendAF = true;
-        }catch (Exception e) {
-            Log.d("hiba","addfriend küldési hiba ");
+        } catch (Exception e) {
+            Log.d("hiba", "addfriend küldési hiba ");
         }
     }
 
-    public void addFriend(int userid){
+    public void addFriend(int userid) {
         String msg = "{\"type\":7, \"userid\":" + userid + "}";
         byte[] bytes = msg.getBytes();
         try {
             dos.writeInt(bytes.length);
             dos.write(bytes);
             dos.flush();
-        }catch (Exception e) {
-            Log.d("hiba","addfriend küldési hiba ");
+        } catch (Exception e) {
+            Log.d("hiba", "addfriend küldési hiba ");
         }
     }
 
-    public void requestFriendList(){
+    public void requestFriendList() {
         String msg = "{\"type\":15}";
         byte[] bytes = msg.getBytes();
         try {
             dos.writeInt(bytes.length);
             dos.write(bytes);
             dos.flush();
-        }catch (Exception e) {
-            Log.d("hiba","requestfriendlist küldési hiba ");
+        } catch (Exception e) {
+            Log.d("hiba", "requestfriendlist küldési hiba ");
         }
     }
 
-    public void userInfoByID(int userid){
+    public void userInfoByID(int userid) {
         String msg = "{\"type\":3, \"userid\":" + userid + "}";
         byte[] bytes = msg.getBytes();
         try {
             dos.writeInt(bytes.length);
             dos.write(bytes);
             dos.flush();
-        }catch (Exception e) {
-            Log.d("hiba","userInfoByID küldési hiba ");
+        } catch (Exception e) {
+            Log.d("hiba", "userInfoByID küldési hiba ");
         }
     }
 
-    public void requests(){
+    public void requests() {
         String msg = "{\"type\":9}";
         byte[] bytes = msg.getBytes();
         try {
             dos.writeInt(bytes.length);
             dos.write(bytes);
             dos.flush();
-        }catch (Exception e) {
-            Log.d("hiba","requests küldési hiba ");
+        } catch (Exception e) {
+            Log.d("hiba", "requests küldési hiba ");
         }
     }
 
-    public void sendedRequests(){
+    public void sendedRequests() {
         String msg = "{\"type\":8}";
         byte[] bytes = msg.getBytes();
         try {
             dos.writeInt(bytes.length);
             dos.write(bytes);
             dos.flush();
-        }catch (Exception e) {
-            Log.d("hiba","sendedreq küldési hiba ");
+        } catch (Exception e) {
+            Log.d("hiba", "sendedreq küldési hiba ");
         }
     }
 
-    public void removeMyself(){
+    public void removeMyself() {
         String msg = "{\"type\":2}";
         byte[] bytes = msg.getBytes();
         try {
             dos.writeInt(bytes.length);
             dos.write(bytes);
             dos.flush();
-        }catch (Exception e) {
-            Log.d("hiba","removeMyself küldési hiba ");
+        } catch (Exception e) {
+            Log.d("hiba", "removeMyself küldési hiba ");
         }
     }
 
-    public void acceptRequest(String userName){
+    public void acceptRequest(String userName) {
         int userid = -1;
 
         int ind = 0;
-        while ( ind < friendRequests.size() ){
+        while (ind < friendRequests.size()) {
             //Log.d(friendRequests.get(ind).getName(),userName);
-            if ( friendRequests.get(ind).getName().equals(userName) ){
+            if (friendRequests.get(ind).getName().equals(userName)) {
                 userid = friendRequests.get(ind).getUserid();
                 break;
             }
             ind++;
         }
         //ideiglenes
-        if (userid == -1){
+        if (userid == -1) {
             Log.d("hiba", "UIhiba");
             return;
         }
 
-        friendList.add( friendRequests.get(ind) );
+        friendList.add(friendRequests.get(ind));
 
         friendRequests.remove(ind);
 
@@ -588,25 +622,25 @@ public class TCPService  extends Service {
             dos.writeInt(bytes.length);
             dos.write(bytes);
             dos.flush();
-        }catch (Exception e) {
-            Log.d("hiba","acceptRequest küldési hiba ");
+        } catch (Exception e) {
+            Log.d("hiba", "acceptRequest küldési hiba ");
         }
     }
 
-    public void undoRequest(String userName){
+    public void undoRequest(String userName) {
         int userid = -1;
 
         int ind = 0;
-        while ( ind < sendedRequests.size() ){
+        while (ind < sendedRequests.size()) {
             //Log.d(friendRequests.get(ind).getName(),userName);
-            if ( sendedRequests.get(ind).getName().equals(userName) ){
+            if (sendedRequests.get(ind).getName().equals(userName)) {
                 userid = sendedRequests.get(ind).getUserid();
                 break;
             }
             ind++;
         }
         //ideiglenes
-        if (userid == -1){
+        if (userid == -1) {
             Log.d("hiba", "UIhiba");
             return;
         }
@@ -619,26 +653,26 @@ public class TCPService  extends Service {
             dos.writeInt(bytes.length);
             dos.write(bytes);
             dos.flush();
-        }catch (Exception e) {
-            Log.d("hiba","undoRequest küldési hiba ");
+        } catch (Exception e) {
+            Log.d("hiba", "undoRequest küldési hiba ");
         }
     }
 
 
-    public void declineRequest(String userName){
+    public void declineRequest(String userName) {
         int userid = -1;
 
         int ind = 0;
-        while ( ind < friendRequests.size() ){
+        while (ind < friendRequests.size()) {
             //Log.d(friendRequests.get(ind).getName(),userName + " " +  friendRequests.size());
-            if ( friendRequests.get(ind).getName().equals(userName) ){
+            if (friendRequests.get(ind).getName().equals(userName)) {
                 userid = friendRequests.get(ind).getUserid();
                 break;
             }
             ind++;
         }
         //ideiglenes
-        if (userid == -1){
+        if (userid == -1) {
             Log.d("hiba", "UIhiba");
             return;
         }
@@ -650,24 +684,24 @@ public class TCPService  extends Service {
             dos.writeInt(bytes.length);
             dos.write(bytes);
             dos.flush();
-        }catch (Exception e) {
-            Log.d("hiba","declineRequest küldési hiba ");
+        } catch (Exception e) {
+            Log.d("hiba", "declineRequest küldési hiba ");
         }
     }
 
-    public void deleteFriend(String userName){
+    public void deleteFriend(String userName) {
         int userid = -1;
 
         int ind = 0;
-        while ( ind < friendList.size() ){
-            if ( friendList.get(ind).getName().equals(userName) ){
+        while (ind < friendList.size()) {
+            if (friendList.get(ind).getName().equals(userName)) {
                 userid = friendList.get(ind).getUserid();
                 break;
             }
             ind++;
         }
         //ideiglenes
-        if (userid == -1){
+        if (userid == -1) {
             Log.d("hiba", "UIhiba");
             return;
         }
@@ -680,8 +714,8 @@ public class TCPService  extends Service {
             dos.writeInt(bytes.length);
             dos.write(bytes);
             dos.flush();
-        }catch (Exception e) {
-            Log.d("hiba","deleteFriend küldési hiba ");
+        } catch (Exception e) {
+            Log.d("hiba", "deleteFriend küldési hiba ");
         }
     }
 
@@ -697,36 +731,36 @@ public class TCPService  extends Service {
         }
     }
 
-    public List<String> getRequestsString(){
+    public List<String> getRequestsString() {
         List str = new ArrayList<>();
-        for ( Friend s : friendRequests ){
+        for (Friend s : friendRequests) {
             str.add(s.getName());
         }
         return str;
     }
 
-    public List<String> getFriendsString(){
+    public List<String> getFriendsString() {
         List str = new ArrayList<>();
-        for ( Friend s : friendList ){
+        for (Friend s : friendList) {
             str.add(s.getName());
         }
         return str;
     }
 
-    public List<String> getSendedString(){
+    public List<String> getSendedString() {
         List str = new ArrayList<>();
-        for ( Friend s : sendedRequests ){
+        for (Friend s : sendedRequests) {
             str.add(s.getName());
         }
         return str;
     }
 
-    public void startConv( String userName ){
+    public void startConv(String userName) {
         int userid = -1;
 
         int ind = 0;
-        while ( ind < friendList.size() ){
-            if ( friendList.get(ind).getName().equals(userName) ){
+        while (ind < friendList.size()) {
+            if (friendList.get(ind).getName().equals(userName)) {
                 userid = friendList.get(ind).getUserid();
                 break;
             }
@@ -734,7 +768,7 @@ public class TCPService  extends Service {
         }
 
         //ideiglenes
-        if (userid == -1){
+        if (userid == -1) {
             Log.d("hiba", "UIhiba");
             return;
         }
@@ -743,29 +777,29 @@ public class TCPService  extends Service {
 
     }
 
-    public void receiveMsg(int n){
-        String msg = "{\"type\":10, \"userid\":" + currentPartner +",\"msgcount\":" + n + "}";
+    public void receiveMsg(int n) {
+        String msg = "{\"type\":10, \"userid\":" + currentPartner + ",\"msgcount\":" + n + "}";
         byte[] bytes = msg.getBytes();
         try {
             dos.writeInt(bytes.length);
             dos.write(bytes);
             dos.flush();
-        }catch (Exception e) {
-            Log.d("hiba","receiveMsg küldési hiba ");
+        } catch (Exception e) {
+            Log.d("hiba", "receiveMsg küldési hiba ");
         }
     }
 
-    public void send(String message){
+    public void send(String message) {
         //{"type":13, "userid":17,"msg":"Szia! Ez egy tesztüzenet."}
 
-        String msg = "{\"type\":13, \"userid\":" + currentPartner + ",\"msg\":\"" + message +"\"}";
+        String msg = "{\"type\":13, \"userid\":" + currentPartner + ",\"msg\":\"" + message + "\"}";
         byte[] bytes = msg.getBytes();
         try {
             dos.writeInt(bytes.length);
             dos.write(bytes);
             dos.flush();
-        }catch (Exception e) {
-            Log.d("hiba","send hiba hiba ");
+        } catch (Exception e) {
+            Log.d("hiba", "send hiba hiba ");
         }
     }
 

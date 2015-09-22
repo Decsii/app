@@ -27,6 +27,9 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
+
 
 public class MainActivity extends ActionBarActivity {
 
@@ -34,6 +37,8 @@ public class MainActivity extends ActionBarActivity {
     private TCPService tcps;
     private boolean mBound = false;
     private Handler messageHandler = new MessageHandler();
+
+    private Realm realm;
 
     public class MessageHandler extends Handler {
         @Override
@@ -56,11 +61,11 @@ public class MainActivity extends ActionBarActivity {
                     startActivity(intent);
                     break;
                 case 1121:
-                    toast = Toast.makeText(MainActivity.this, "Hibás felhasználónév/jelszó",  Toast.LENGTH_SHORT);
+                    toast = Toast.makeText(MainActivity.this, "Hibás felhasználónév/jelszó", Toast.LENGTH_SHORT);
                     toast.show();
                     break;
                 case 112:
-                    toast = Toast.makeText(MainActivity.this, "Már be vagy jelentkezve",  Toast.LENGTH_SHORT);
+                    toast = Toast.makeText(MainActivity.this, "Már be vagy jelentkezve", Toast.LENGTH_SHORT);
                     toast.show();
                     break;
             }
@@ -89,6 +94,14 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = new Intent(this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         this.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
+        Realm realm = Realm.getInstance(this);
+        RealmResults<Messages> result = realm.where(Messages.class)
+                .findAll();
+        Log.d("result", result.toString());
+        realm.beginTransaction();
+        result.clear();
+        realm.commitTransaction();
     }
 
     @Override
@@ -111,17 +124,16 @@ public class MainActivity extends ActionBarActivity {
 
         Button btn2 = (Button) findViewById(R.id.regB);
         btn2.setOnClickListener(regA);
-
     }
 
     private View.OnClickListener signInA = new View.OnClickListener() {
-        public void onClick(View v){
+        public void onClick(View v) {
             logIn();
         }
     };
 
     private View.OnClickListener regA = new View.OnClickListener() {
-        public void onClick(View v){
+        public void onClick(View v) {
             toRegistration();
         }
     };
@@ -148,22 +160,22 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void logIn(){
+    public void logIn() {
         EditText userName = (EditText) findViewById(R.id.usernameText);
         EditText pass = (EditText) findViewById(R.id.passwordText);
-        if ( userName.getText().toString() != "" && pass.getText().toString() != "" ){
+        if (userName.getText().toString() != "" && pass.getText().toString() != "") {
             tcps.logIn(userName.getText().toString(), pass.getText().toString());
         }
     }
 
-    public void toRegistration(){
+    public void toRegistration() {
         Intent intent = new Intent(this, RegistrationActivity.class);
         String message = "nomsg";
         intent.putExtra(EXTRA_MESSAGE, message);
         startActivity(intent);
     }
 
-    private void onServiceReady(){
+    private void onServiceReady() {
         mBound = true;
         Intent intent = new Intent(MainActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));

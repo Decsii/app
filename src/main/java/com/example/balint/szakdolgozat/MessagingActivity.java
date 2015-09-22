@@ -25,6 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
+
 
 public class MessagingActivity extends ActionBarActivity {
 
@@ -130,32 +133,85 @@ public class MessagingActivity extends ActionBarActivity {
     }
 
     private View.OnClickListener sendBclick = new View.OnClickListener() {
-        public void onClick(View v){
-            if ( messageF.getText().toString() != "" ){
+        public void onClick(View v) {
+            if (messageF.getText().toString() != "") {
                 tcps.send(messageF.getText().toString());
                 messageList.add(messageF.getText().toString());
                 messageAdapter.addMessage(messageF.getText().toString(), MessageAdapter.DIRECTION_OUTGOING);
-                tcps.messagesList.add(new Pair(messageF.getText().toString(),1));
+                tcps.messagesList.add(new Pair(messageF.getText().toString(), 1));
             }
         }
     };
 
-    private void msgRecieved(){
-        messageAdapter.addMessage(tcps.currUz, MessageAdapter.DIRECTION_INCOMING);
+    private void msgRecieved() {
+        Realm realm = Realm.getInstance(this);
+        RealmResults<Messages> result = realm.where(Messages.class)
+                .equalTo("fromid", tcps.currentPartner)
+                .or()
+                .equalTo("fromid", tcps.myId)
+                .findAll();
+
+        List<String> asd = new ArrayList<>();
+        List<Integer> asd2 = new ArrayList<>();
+        for (Messages msg : result) {
+            asd.add(msg.getMsg());
+            asd2.add(msg.getFromid());
+        }
+        Log.d("", asd.toString());
+        for (int i = 0; i < asd.size(); i++) {
+            String message = asd.get(i);
+            if (tcps.myId == asd2.get(i)) {
+                messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
+            } else {
+                messageAdapter.addMessage(message, MessageAdapter.DIRECTION_INCOMING);
+            }
+        }
+        //messageAdapter.addMessage(tcps.currUz, MessageAdapter.DIRECTION_INCOMING);
     }
 
     private void populateMessageHistory() {
-        for (int i = 0; i <  tcps.messagesList.size(); i++) {
-            String message =  tcps.messagesList.get(i).first;
-            if ( tcps.messagesList.get(i).second == 1) {
-                messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
-            } else {
-                 messageAdapter.addMessage(message, MessageAdapter.DIRECTION_INCOMING);
-             }
+
+        Realm realm = Realm.getInstance(this);
+
+        RealmResults<Messages> result = realm.where(Messages.class)
+                .equalTo("fromid", tcps.currentPartner)
+                .or()
+                .equalTo("fromid", tcps.myId)
+                .findAll();
+
+
+        List<String> asd = new ArrayList<>();
+        List<Integer> asd2 = new ArrayList<>();
+        if (result.size() != 0) {
+            for (Messages msg : result) {
+                asd.add(msg.getMsg());
+                asd2.add(msg.getFromid());
+            }
+            Log.d("", asd.toString());
+            for (int i = 0; i < asd.size(); i++) {
+                String message = asd.get(i);
+                if (tcps.myId == asd2.get(i)) {
+                    messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
+                } else {
+                    messageAdapter.addMessage(message, MessageAdapter.DIRECTION_INCOMING);
+                }
+            }
+        } else {
+            Log.d("", "10 üzit lekérünk mert üres a DB");
+            tcps.receiveMsg(10);
         }
+
+        //for (int i = 0; i <  tcps.messagesList.size(); i++) {
+        //    String message =  tcps.messagesList.get(i).first;
+        //    if ( tcps.messagesList.get(i).second == 1) {
+        //        messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
+        //    } else {
+        //         messageAdapter.addMessage(message, MessageAdapter.DIRECTION_INCOMING);
+        //     }
+        //}
     }
 
-    private void onServiceReady(){
+    private void onServiceReady() {
         mBound = true;
         Intent intent = new Intent(MessagingActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
