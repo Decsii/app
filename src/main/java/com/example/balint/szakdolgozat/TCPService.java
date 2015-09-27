@@ -1,47 +1,28 @@
 package com.example.balint.szakdolgozat;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.Pair;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.AbstractQueue;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-import java.util.Random;
 
 import io.realm.Realm;
-import io.realm.RealmMigration;
 import io.realm.RealmResults;
 
 /**
@@ -86,10 +67,12 @@ public class TCPService extends Service {
     private String addFName;
 
     private boolean byebye = false;
-
+    private int messagesArrived;
     String currUz;
 
     public boolean requestedyet = false;
+
+    private List<Integer> leftList = new ArrayList<>();
 
     public class LocalBinder extends Binder {
         TCPService getService() {
@@ -179,9 +162,9 @@ public class TCPService extends Service {
                     try {
                         int length = dis.readInt();
                         byte[] bytes = new byte[length];
-                        dis.read(bytes, 0, length);
+                        dis.readFully(bytes);
+                        //dis.read(bytes, 0, length);
                         str = new String(bytes);
-
                     } catch (IOException e) {
                         startTCP();
                         Log.d("", "start communication leááált");
@@ -238,7 +221,6 @@ public class TCPService extends Service {
                     if (sendedR) {
                         sendedRequests.get(numOfSended - 1).setName(jo2.getString("username"));
                         if (sendedRequests.size() == numOfSended) {
-                            //sendMessage(8);
                             numOfSended = 0;
                             sendedR = false;
                         } else {
@@ -250,7 +232,6 @@ public class TCPService extends Service {
                     if (requestS) {
                         friendRequests.get(numOfRequests - 1).setName(jo2.getString("username"));
                         if (friendRequests.size() == numOfRequests) {
-                            //sendMessage(9);
                             requestS = false;
                             numOfRequests = 0;
                             sendedRequests();
@@ -264,10 +245,12 @@ public class TCPService extends Service {
                         requestedyet = true;
                         friendList.get(numOfFriends - 1).setName(jo2.getString("username"));
                         if (friendList.size() == numOfFriends) {
-                            sendMessage(15);
                             friendS = false;
                             numOfFriends = 0;
                             requests();
+                            for (Friend f : friendList) {
+                                getMsg(f.getUserid(), 10);
+                            }
                         } else {
                             userInfoByID(friendList.get(numOfFriends).getUserid());
                             numOfFriends++;
@@ -295,77 +278,115 @@ public class TCPService extends Service {
                     requestListHandler(jsonRootObject.optJSONArray("requests"));
                     break;
                 case "10":
+                    Log.d("","üzenett jötttttttttttttt");
                     try {
                         Realm realm = Realm.getInstance(this);
                         jArr = jsonRootObject.optJSONArray("messages");
-                        for (int i = 0; i < jArr.length(); i++) {
-                            int kuldo = jArr.getJSONObject(i).getInt("from");
-                            //if (kuldo == currentPartner) {
-                            //if (timeS != jArr.getJSONObject(i).getDouble("t")) {
-                            Log.d("", "bejövü tüzenetet eltárolujk");
-                            timeS = jArr.getJSONObject(i).getDouble("t");
-                            currUz = jArr.getJSONObject(i).getString("msg");
-                            messagesList.add(new Pair(currUz, 0));
+                        if( jArr.length() == 0 ){
+                            messagesArrived++;
+                            if (messagesArrived == friendList.size()) {
+                                messagesArrived = 0;
+                                sendMessage(10);
+                                Log.d("","MINdEN ÜZENET MEGÉRKEZETT");
+                            }
+                            return;
+                        }
 
-                            RealmResults<Messages> result = realm.where(Messages.class)
-                                    .findAll();
-                            realm.beginTransaction();
+                        //RealmResults<DBMessage> result = realm.where(DBMessage.class)
+                        //        .equalTo("fromid", jArr.getJSONObject(0).getInt("from"))
+                        //        .or()
+                        //        .equalTo("fromid", jArr.getJSONObject(0).getInt("to"))
+                        //        .findAll();
 
-                            if (result.size() > 20) {
-                                long min = result.min("msgid").longValue();
-                                for (Messages msg : result) {
-                                    if (min == msg.getMsgid()) {
-                                        msg.removeFromRealm();
-                                        break;
+                        RealmResults<DBMessage> result = realm.where(DBMessage.class)
+                                .beginGroup()
+                                    .equalTo("fromid", jArr.getJSONObject(0).getInt("from"))
+                                    .equalTo("toid", jArr.getJSONObject(0).getInt("to"))
+                                .endGroup()
+                                .or()
+                                .beginGroup()
+                                    .equalTo("fromid", jArr.getJSONObject(0).getInt("to"))
+                                    .equalTo("toid", jArr.getJSONObject(0).getInt("from"))
+                                .endGroup()
+                                .findAll();
+
+                        for( Integer in : leftList ){
+                            if( in == jArr.getJSONObject(0).getInt("from") || in == jArr.getJSONObject(0).getInt("to") ){
+                                messagesArrived++;
+                                for (int i = 0; i < jArr.length(); i++) {
+                                    if (jArr.getJSONObject(i).getInt("msgid") > result.max("msgid").intValue()) {
+                                        insertMessage(realm, jArr.getJSONObject(0).getInt("from"), jArr.getJSONObject(i).getString("msg"), jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(i).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
                                     }
                                 }
+                                if (messagesArrived == friendList.size()) {
+                                    messagesArrived = 0;
+                                    sendMessage(10);
+                                    Log.d("","MINdEN ÜZENET MEGÉRKEZETT");
+                                }
+                                return;
                             }
-
-                            Messages msg = realm.createObject(Messages.class);
-                            msg.setMsg(currUz);
-                            msg.setFromid(currentPartner);
-                            msg.setMsgid(jArr.getJSONObject(0).getInt("msgid"));
-                            msg.setT(timeS);
-
-                            realm.commitTransaction();
-                            //}
-                            //}
                         }
-                        sendMessage(10);
+
+                        if( jArr.length() == 20 ){
+                            messagesArrived++;
+                            for (int i = 0; i < jArr.length(); i++) {
+                                if (jArr.getJSONObject(i).getInt("msgid") > result.max("msgid").intValue()) {
+                                    insertMessage(realm, jArr.getJSONObject(0).getInt("from"), jArr.getJSONObject(i).getString("msg"), jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(i).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
+                                }
+                            }
+                        }else {
+                            long max = result.max("msgid").longValue();
+                            if (max != 0) {
+                                if (jArr.getJSONObject(0).getInt("msgid") > max) {
+                                    //leftList.add(jArr);
+                                    //getMoreMsg(myId, jArr.getJSONObject(0).getInt("msgid"), 20);
+                                    if( jArr.getJSONObject(0).getInt("from") == myId ){
+                                        leftList.add(jArr.getJSONObject(0).getInt("to"));
+                                        getMsg(jArr.getJSONObject(0).getInt("to"), 20);
+                                    }else{
+                                        leftList.add(jArr.getJSONObject(0).getInt("from"));
+                                        getMsg(jArr.getJSONObject(0).getInt("from"), 20);
+                                    }
+
+                                } else {
+                                    messagesArrived++;
+                                    for (int i = 0; i < jArr.length(); i++) {
+                                        if (jArr.getJSONObject(i).getInt("msgid") > result.max("msgid").intValue()) {
+                                            insertMessage(realm, jArr.getJSONObject(0).getInt("from"), jArr.getJSONObject(i).getString("msg"), jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(i).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
+                                        }
+                                    }
+                                }
+                            } else {
+                                //leftList.add(jArr);
+                                //getMoreMsg(myId, jArr.getJSONObject(0).getInt("msgid"), 20);
+                                if( jArr.getJSONObject(0).getInt("from") == myId ){
+                                    getMsg(jArr.getJSONObject(0).getInt("to"), 20);
+                                    leftList.add(jArr.getJSONObject(0).getInt("to"));
+                                }else{
+                                    getMsg(jArr.getJSONObject(0).getInt("from"), 20);
+                                    leftList.add(jArr.getJSONObject(0).getInt("from"));
+                                }
+                                //for (int i = 0; i < jArr.length(); i++) {
+                                //    if (jArr.getJSONObject(i).getInt("msgid") > result.max("msgid").intValue()) {
+                                //        insertMessage(realm, currentPartner, jArr.getJSONObject(i).getString("msg"), jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(i).getDouble("t"));
+                                //    }
+                                //}
+                            }
+                        }
+                        if (messagesArrived == friendList.size()) {
+                            messagesArrived = 0;
+                            sendMessage(10);
+                            Log.d("","MINdEN ÜZENET MEGÉRKEZETT");
+                        }
                     } catch (Exception e) {
-                        Log.d("", "10 as error");
+                        Log.d("", Log.getStackTraceString(e));
                     }
                     break;
                 case "13":
                     try {
                         Realm realm = Realm.getInstance(this);
-
                         jObj = jsonRootObject.optJSONObject("message");
-
-                        RealmResults<Messages> result = realm.where(Messages.class)
-                                .findAll();
-
-                        realm.beginTransaction();
-
-                        if (result.size() > 20) {
-                            long min = result.min("msgid").longValue();
-                            for (Messages msg : result) {
-                                if (min == msg.getMsgid()) {
-                                    msg.removeFromRealm();
-                                    break;
-                                }
-                            }
-                        }
-
-                        Messages msg = realm.createObject(Messages.class);
-                        msg.setMsg(jObj.getString("msg"));
-                        msg.setFromid(jObj.getInt("from"));
-                        msg.setMsgid(jObj.getInt("msgid"));
-                        msg.setT(jObj.getDouble("t"));
-
-                        realm.commitTransaction();
-
-                        Log.d("", "küldöt tüzenetet eltárolujk");
+                        insertMessage(realm, jObj.getInt("from"), jObj.getString("msg"),jObj.getInt("msgid"), jObj.getDouble("t"), jObj.getInt("to"));
                         sendMessage(13);
                     } catch (Exception e) {
                         Log.d("", "13 as error");
@@ -401,6 +422,42 @@ public class TCPService extends Service {
             Log.d("semi :" + jsonRootObject.get("code").toString() + " ", jsonRootObject.get("error").toString());
         }
 
+    }
+
+    public void insertMessage(Realm realm, int fromid, String msg, int msgid, double t, int toid) {
+        //Realm realm = Realm.getInstance(this);
+        realm.beginTransaction();
+
+        RealmResults<DBMessage> result = realm.where(DBMessage.class)
+                .beginGroup()
+                    .equalTo("fromid", fromid)
+                    .equalTo("toid", toid)
+                .endGroup()
+                .or()
+                .beginGroup()
+                    .equalTo("fromid", toid)
+                    .equalTo("toid", fromid)
+                .endGroup()
+                .findAll();
+
+        if (result.size() >= 20) {
+            long min = result.min("msgid").longValue();
+            for (DBMessage msgObj : result) {
+                if (min == msgObj.getMsgid()) {
+                    msgObj.removeFromRealm();
+                    break;
+                }
+            }
+        }
+
+        DBMessage msgObj = realm.createObject(DBMessage.class);
+        msgObj.setMsg(msg);
+        msgObj.setFromid(fromid);
+        msgObj.setToid(toid);
+        msgObj.setMsgid(msgid);
+        msgObj.setT(t);
+
+        realm.commitTransaction();
     }
 
     public void logOut() {
@@ -722,7 +779,7 @@ public class TCPService extends Service {
 
     public void sendMessage(int state) {
         Log.d("kuldok", "uzenetet");
-        Message message = Message.obtain();
+        android.os.Message message = android.os.Message.obtain();
         message.arg1 = state;
         try {
             messageHandler.send(message);
@@ -785,7 +842,32 @@ public class TCPService extends Service {
             dos.write(bytes);
             dos.flush();
         } catch (Exception e) {
-            Log.d("hiba", "receiveMsg küldési hiba ");
+            Log.d("hiba", "asdasd receiveMsg küldési hiba ");
+        }
+    }
+
+    public void getMsg(int userid, int n) {
+        String msg = "{\"type\":10, \"userid\":" + userid + ",\"msgcount\":" + n + "}";
+        String msg2 = "{\"type\":10, \"userid\":26,\"msgcount\":20}";
+        byte[] bytes = msg.getBytes();
+        try {
+            dos.writeInt(bytes.length);
+            dos.write(bytes);
+            dos.flush();
+        } catch (Exception e) {
+            Log.d("hiba", "getMsg küldési hiba ");
+        }
+    }
+
+    public void getMoreMsg(int userid, int minmsgid, int n) {
+        String msg = "{\"type\":11, \"userid\":" + userid + ",\"msgid\":" + minmsgid + ",\"msgcount\":" + n + "}";
+        byte[] bytes = msg.getBytes();
+        try {
+            dos.writeInt(bytes.length);
+            dos.write(bytes);
+            dos.flush();
+        } catch (Exception e) {
+            Log.d("hiba", "getMoreMsg küldési hiba ");
         }
     }
 

@@ -5,7 +5,7 @@ import android.widget.BaseAdapter;
 /**
  * Created by Balint on 2015.09.22..
  */
-public class FriendListItem{
+public class FriendListItem {
 
     String img;
     String name;

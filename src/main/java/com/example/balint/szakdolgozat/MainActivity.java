@@ -1,16 +1,12 @@
 package com.example.balint.szakdolgozat;
 
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.Messenger;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,12 +16,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.Map;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -42,7 +32,7 @@ public class MainActivity extends ActionBarActivity {
 
     public class MessageHandler extends Handler {
         @Override
-        public void handleMessage(Message message) {
+        public void handleMessage(android.os.Message message) {
             int state = message.arg1;
             Intent intent;
             Toast toast;
@@ -96,12 +86,27 @@ public class MainActivity extends ActionBarActivity {
         this.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
         Realm realm = Realm.getInstance(this);
-        RealmResults<Messages> result = realm.where(Messages.class)
-                .findAll();
+       RealmResults<DBMessage> result = realm.where(DBMessage.class)
+               .findAll();
+        //RealmResults<DBMessage> result = realm.where(DBMessage.class)
+        //        .beginGroup()
+        //        .equalTo("fromid", 26)
+        //        .equalTo("toid", 28)
+        //        .endGroup()
+        //        .or()
+        //        .beginGroup()
+        //        .equalTo("fromid", 28)
+        //        .equalTo("toid", 26)
+        //        .endGroup()
+        //        .findAll();
         Log.d("result", result.toString());
-        realm.beginTransaction();
-        result.clear();
-        realm.commitTransaction();
+        //realm.beginTransaction();
+        //result.clear();
+        //realm.commitTransaction();
+        //RealmResults<Messages> result2 = realm.where(Messages.class)
+        //        .findAll();
+        //int asdf = result2.max("msgid").intValue();
+        //Log.d("resultMAX","" + asdf );
     }
 
     @Override

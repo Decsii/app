@@ -26,6 +26,9 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
+
 
 public class FriendListActivity extends ActionBarActivity {
 
@@ -82,6 +85,9 @@ public class FriendListActivity extends ActionBarActivity {
                 case 16:
                     writeFriendList();
                     break;
+                case 10:
+                    writeFriendList();
+                    break;
                 case 900:
                     intent = new Intent(FriendListActivity.this, MessagingActivity.class);
                     uz = "nomsg";
@@ -131,7 +137,6 @@ public class FriendListActivity extends ActionBarActivity {
 
         usersListView = (ListView) findViewById(R.id.usersListView);
         fla = new FriendListAdapter(this);
-        usersListView.setAdapter(fla);
 
         Button btn = (Button) findViewById(R.id.frequestB);
         btn.setOnClickListener(requestB);
@@ -248,13 +253,12 @@ public class FriendListActivity extends ActionBarActivity {
     private void writeFriendList() {
         currentView = 0;
         friendList = tcps.getFriendsString();
+        usersListView.setAdapter(fla);
         //namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.user_list_item, friendList);
         //usersListView.setAdapter(namesArrayAdapter);
-
-
-
-        for( String s : friendList ){
-            fla.addMessage(new FriendListItem("","","",""));
+        fla.clearList();
+        for (String s : friendList) {
+            fla.addFriend(new FriendListItem("", s, "", ""));
         }
 
         usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -309,6 +313,7 @@ public class FriendListActivity extends ActionBarActivity {
         Intent intent = new Intent(FriendListActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
+        Log.d("","FRIEND REQUEST");
         if (!tcps.requestedyet) tcps.requestFriendList();
     }
 }

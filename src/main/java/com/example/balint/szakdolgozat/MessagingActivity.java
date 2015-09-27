@@ -6,11 +6,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
@@ -19,11 +17,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -45,7 +41,7 @@ public class MessagingActivity extends ActionBarActivity {
 
     public class MessageHandler extends Handler {
         @Override
-        public void handleMessage(Message message) {
+        public void handleMessage(android.os.Message message) {
             int state = message.arg1;
             Intent intent;
             String uz;
@@ -145,15 +141,27 @@ public class MessagingActivity extends ActionBarActivity {
 
     private void msgRecieved() {
         Realm realm = Realm.getInstance(this);
-        RealmResults<Messages> result = realm.where(Messages.class)
+        //RealmResults<DBMessage> result = realm.where(DBMessage.class)
+        //        .equalTo("fromid", tcps.currentPartner)
+        //        .or()
+        //        .equalTo("fromid", tcps.myId)
+        //        .findAll();
+
+        RealmResults<DBMessage> result = realm.where(DBMessage.class)
+                .beginGroup()
                 .equalTo("fromid", tcps.currentPartner)
+                .equalTo("toid", tcps.myId)
+                .endGroup()
                 .or()
+                .beginGroup()
                 .equalTo("fromid", tcps.myId)
+                .equalTo("toid", tcps.currentPartner)
+                .endGroup()
                 .findAll();
 
         List<String> asd = new ArrayList<>();
         List<Integer> asd2 = new ArrayList<>();
-        for (Messages msg : result) {
+        for (DBMessage msg : result) {
             asd.add(msg.getMsg());
             asd2.add(msg.getFromid());
         }
@@ -173,41 +181,44 @@ public class MessagingActivity extends ActionBarActivity {
 
         Realm realm = Realm.getInstance(this);
 
-        RealmResults<Messages> result = realm.where(Messages.class)
-                .equalTo("fromid", tcps.currentPartner)
+        //RealmResults<DBMessage> result = realm.where(DBMessage.class)
+        //        .equalTo("fromid", tcps.currentPartner)
+        //        .or()
+        //        .equalTo("fromid", tcps.myId)
+        //        .findAll();
+
+        RealmResults<DBMessage> result2 = realm.where(DBMessage.class).findAll();
+        Log.d("",result2.toString());
+        Log.d("test1",tcps.currentPartner + " " + tcps.myId);
+        RealmResults<DBMessage> result = realm.where(DBMessage.class)
+                .beginGroup()
+                    .equalTo("fromid", tcps.currentPartner)
+                    .equalTo("toid", tcps.myId)
+                .endGroup()
                 .or()
-                .equalTo("fromid", tcps.myId)
+                .beginGroup()
+                    .equalTo("fromid", tcps.myId)
+                    .equalTo("toid", tcps.currentPartner)
+                .endGroup()
                 .findAll();
 
+        Log.d("",result.toString());
+        result.sort("msgid");
         List<String> asd = new ArrayList<>();
         List<Integer> asd2 = new ArrayList<>();
-        if (result.size() != 0) {
-            for (Messages msg : result) {
-                asd.add(msg.getMsg());
-                asd2.add(msg.getFromid());
-            }
-            Log.d("", asd.toString());
-            for (int i = 0; i < asd.size(); i++) {
-                String message = asd.get(i);
-                if (tcps.myId == asd2.get(i)) {
-                    messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
-                } else {
-                    messageAdapter.addMessage(message, MessageAdapter.DIRECTION_INCOMING);
-                }
-            }
-        } else {
-            Log.d("", "10 üzit lekérünk mert üres a DB");
-            tcps.receiveMsg(10);
+        for (DBMessage msg : result) {
+            asd.add(msg.getMsg());
+            asd2.add(msg.getFromid());
         }
-
-        //for (int i = 0; i <  tcps.messagesList.size(); i++) {
-        //    String message =  tcps.messagesList.get(i).first;
-        //    if ( tcps.messagesList.get(i).second == 1) {
-        //        messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
-        //    } else {
-        //         messageAdapter.addMessage(message, MessageAdapter.DIRECTION_INCOMING);
-        //     }
-        //}
+        Log.d("", asd.toString());
+        for (int i = 0; i < asd.size(); i++) {
+            String message = asd.get(i);
+            if (tcps.myId == asd2.get(i)) {
+                messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
+            } else {
+                messageAdapter.addMessage(message, MessageAdapter.DIRECTION_INCOMING);
+            }
+        }
     }
 
     private void onServiceReady() {

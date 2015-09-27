@@ -25,9 +25,13 @@ public class FriendListAdapter extends BaseAdapter {
         fli = new ArrayList<>();
     }
 
-    public void addMessage(FriendListItem e) {
+    public void addFriend(FriendListItem e) {
         fli.add(e);
         notifyDataSetChanged();
+    }
+
+    public void clearList() {
+        fli.clear();
     }
 
     @Override
@@ -64,13 +68,13 @@ public class FriendListAdapter extends BaseAdapter {
         //String name = fli.get(i).getName();
 
         TextView txtMessage = (TextView) convertView.findViewById(R.id.nameText);
-        txtMessage.setText("Király -Buzi- Balázs");
+        txtMessage.setText(fli.get(i).getName());
 
         TextView txtMessage2 = (TextView) convertView.findViewById(R.id.lastMsgText);
-        txtMessage2.setText("Szeretem a brét");
+        txtMessage2.setText("Nem mukodik");
 
         TextView txtMessage3 = (TextView) convertView.findViewById(R.id.timeText);
-        txtMessage3.setText("Most");
+        txtMessage3.setText("Nem");
 
         return convertView;
     }
