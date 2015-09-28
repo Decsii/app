@@ -50,6 +50,9 @@ public class MessagingActivity extends ActionBarActivity {
                     Log.d("service", "kézbesitbe");
                     break;
                 case 10:
+                    //msgRecieved();
+                    break;
+                case 16:
                     msgRecieved();
                     break;
             }
@@ -135,45 +138,29 @@ public class MessagingActivity extends ActionBarActivity {
                 messageList.add(messageF.getText().toString());
                 messageAdapter.addMessage(messageF.getText().toString(), MessageAdapter.DIRECTION_OUTGOING);
                 tcps.messagesList.add(new Pair(messageF.getText().toString(), 1));
+                messageF.setText("");
             }
         }
     };
 
     private void msgRecieved() {
-        Realm realm = Realm.getInstance(this);
-        //RealmResults<DBMessage> result = realm.where(DBMessage.class)
-        //        .equalTo("fromid", tcps.currentPartner)
-        //        .or()
-        //        .equalTo("fromid", tcps.myId)
-        //        .findAll();
 
-        RealmResults<DBMessage> result = realm.where(DBMessage.class)
-                .beginGroup()
-                .equalTo("fromid", tcps.currentPartner)
-                .equalTo("toid", tcps.myId)
-                .endGroup()
-                .or()
-                .beginGroup()
-                .equalTo("fromid", tcps.myId)
-                .equalTo("toid", tcps.currentPartner)
-                .endGroup()
-                .findAll();
-
-        List<String> asd = new ArrayList<>();
-        List<Integer> asd2 = new ArrayList<>();
-        for (DBMessage msg : result) {
-            asd.add(msg.getMsg());
-            asd2.add(msg.getFromid());
-        }
-        Log.d("", asd.toString());
-        for (int i = 0; i < asd.size(); i++) {
-            String message = asd.get(i);
-            if (tcps.myId == asd2.get(i)) {
-                messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
-            } else {
-                messageAdapter.addMessage(message, MessageAdapter.DIRECTION_INCOMING);
-            }
-        }
+        messageAdapter.addMessage(tcps.getMsgQ().poll(), MessageAdapter.DIRECTION_INCOMING);
+        //List<String> asd = new ArrayList<>();
+        //List<Integer> asd2 = new ArrayList<>();
+        //for (DBMessage msg : result) {
+        //    asd.add(msg.getMsg());
+        //    asd2.add(msg.getFromid());
+        //}
+        //Log.d("", asd.toString());
+        //for (int i = 0; i < asd.size(); i++) {
+        //    String message = asd.get(i);
+        //    if (tcps.myId == asd2.get(i)) {
+        //        messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
+        //    } else {
+        //        messageAdapter.addMessage(message, MessageAdapter.DIRECTION_INCOMING);
+        //    }
+        //}
         //messageAdapter.addMessage(tcps.currUz, MessageAdapter.DIRECTION_INCOMING);
     }
 

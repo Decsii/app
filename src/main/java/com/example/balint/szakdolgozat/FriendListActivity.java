@@ -156,20 +156,20 @@ public class FriendListActivity extends ActionBarActivity {
         Log.d("éppen", "most");
         if (v.getId() == R.id.usersListView) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-            menu.setHeaderTitle("Balazs lenni homi");
+            menu.setHeaderTitle("Menu");
 
             switch (currentView) {
                 case 0:
-                    menuItems = new String[]{"Törlés", "Kolbasz", "Lovacska"};
+                    menuItems = new String[]{"Törlés"};
                     break;
                 case 1:
-                    menuItems = new String[]{"Visszautasitás", "Kolbasz", "Lovacska"};
+                    menuItems = new String[]{"Visszautasitás"};
                     break;
                 case 2:
-                    menuItems = new String[]{"DicsakBuksi", "Kolbasz", "Lovacska"};
+                    menuItems = new String[]{""};
                     break;
                 default:
-                    menuItems = new String[]{"DicsakBuksi", "Kolbasz", "Lovacska"};
+                    menuItems = new String[]{""};
                     break;
             }
             for (int i = 0; i < menuItems.length; i++) {

@@ -20,7 +20,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -74,6 +76,8 @@ public class TCPService extends Service {
 
     private List<Integer> leftList = new ArrayList<>();
 
+    private Queue<String> msgQ = new LinkedList<>();
+
     public class LocalBinder extends Binder {
         TCPService getService() {
             return TCPService.this;
@@ -90,6 +94,7 @@ public class TCPService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.d("","SeERVICE destroy");
         super.onDestroy();
     }
 
@@ -112,6 +117,7 @@ public class TCPService extends Service {
     }
 
     public void startTCP() {
+        Log.d("","SeERVICE START");
         Thread t1 = new Thread() {
             public void run() {
                 while (true) {
@@ -138,7 +144,6 @@ public class TCPService extends Service {
                             }
                         };
                         thread2.start();
-                        Log.d("", "start tcp leááált");
                         break;
                     } catch (Exception e) {
                         try {
@@ -167,7 +172,6 @@ public class TCPService extends Service {
                         str = new String(bytes);
                     } catch (IOException e) {
                         startTCP();
-                        Log.d("", "start communication leááált");
                         break;
                     }
                     Log.d("server : ", str);
@@ -214,6 +218,7 @@ public class TCPService extends Service {
                     Log.d("tipus : ", "bejelentkezesi kerelem");
                     break;
                 case "2":
+                    logOut();
                     sendMessage(2);
                 case "3":
                     JSONObject jo2 = jsonRootObject.optJSONObject("userdata");
@@ -407,6 +412,17 @@ public class TCPService extends Service {
                     break;
                 case "16":
                     sendMessage(16);
+                    break;
+                case "19" :
+                    jArr = jsonRootObject.optJSONArray("messages");
+                    Realm realm = Realm.getInstance(this);
+                    if( jArr.getJSONObject(0).getInt("to") == myId) {
+                        insertMessage(realm, jArr.getJSONObject(0).getInt("from"), jArr.getJSONObject(0).getString("msg"),jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(0).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
+                        msgQ.add(jArr.getJSONObject(0).getString("msg"));
+                        sendMessage(16);
+                    }else{
+                        insertMessage(realm, jArr.getJSONObject(0).getInt("from"), jArr.getJSONObject(0).getString("msg"),jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(0).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
+                    }
                     break;
             }
         } else {
@@ -885,4 +901,7 @@ public class TCPService extends Service {
         }
     }
 
+    public Queue<String> getMsgQ() {
+        return msgQ;
+    }
 }

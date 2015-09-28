@@ -71,10 +71,10 @@ public class FriendListAdapter extends BaseAdapter {
         txtMessage.setText(fli.get(i).getName());
 
         TextView txtMessage2 = (TextView) convertView.findViewById(R.id.lastMsgText);
-        txtMessage2.setText("Nem mukodik");
+        txtMessage2.setText("");
 
         TextView txtMessage3 = (TextView) convertView.findViewById(R.id.timeText);
-        txtMessage3.setText("Nem");
+        txtMessage3.setText("");
 
         return convertView;
     }

@@ -55,6 +55,14 @@
             android:layout_height="wrap_content"
             android:text="sended"
             android:id="@+id/writeSended" />
+
+        <Button
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:text="Profile"
+            android:id="@+id/profileB"
+            android:layout_weight="1"
+            />
     </LinearLayout>
 
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
