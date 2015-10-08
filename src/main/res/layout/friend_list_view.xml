@@ -6,7 +6,7 @@
     android:id="@+id/cardLayout"
     android:baselineAligned="false">
 
-    <ImageView
+    <com.example.balint.szakdolgozat.RoundedImageView
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:src="@drawable/balazs"
@@ -27,7 +27,7 @@
             android:id="@+id/nameText"
             android:layout_marginLeft="3dp"
             android:textSize="20sp"
-            android:textColor="#000"/>
+            android:textColor="#990000"/>
             android:layout_gravity="center_horizontal" />
 
         <TextView

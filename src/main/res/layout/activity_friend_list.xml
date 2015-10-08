@@ -30,45 +30,50 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
         android:id="@+id/laout">
 
-        <Button
-            style="?android:attr/buttonStyleSmall"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
             android:layout_weight="1"
-            android:layout_width="0px"
-            android:layout_height="wrap_content"
-            android:text="friend"
-            android:id="@+id/writeFriendList" />
+            android:layout_height="70dp"
+            android:id="@+id/aaaa">
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:background="@drawable/button_friendlist"
+                android:id="@+id/writeFriendList" />
+        </LinearLayout>
 
         <Button
-            android:layout_weight="1"
-            android:layout_width="0px"
-            android:layout_height="wrap_content"
-            android:text="requestq"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@drawable/button_requests"
             android:id="@+id/frequestB" />
 
         <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_weight="1"
-            android:layout_width="0px"
-            android:layout_height="wrap_content"
-            android:text="sended"
-            android:id="@+id/writeSended" />
-
-        <Button
-            android:layout_width="0px"
-            android:layout_height="wrap_content"
-            android:text="Profile"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@drawable/button_profile"
             android:id="@+id/profileB"
-            android:layout_weight="1"
             />
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@drawable/button_addfriend"
+            android:id="@+id/nulla" />
+
     </LinearLayout>
 
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/off_white"
+        android:divider="#990000"
+        android:dividerHeight="1px"
         android:id="@+id/usersListView">
     </ListView>
 

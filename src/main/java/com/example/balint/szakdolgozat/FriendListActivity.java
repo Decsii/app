@@ -147,8 +147,8 @@ public class FriendListActivity extends ActionBarActivity {
         Button btn3 = (Button) findViewById(R.id.writeFriendList);
         btn3.setOnClickListener(writeFriendListB);
 
-        Button btn4 = (Button) findViewById(R.id.writeSended);
-        btn4.setOnClickListener(writeSendedB);
+        //Button btn4 = (Button) findViewById(R.id.writeSended);
+        //btn4.setOnClickListener(writeSendedB);
     }
 
     @Override
