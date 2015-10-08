@@ -1,4 +1,4 @@
-package com.example.balint.szakdolgozat;
+package com.example.balint.szakdolgozat.activities;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,6 +16,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.balint.szakdolgozat.javaclasses.DBMessage;
+import com.example.balint.szakdolgozat.R;
+import com.example.balint.szakdolgozat.javaclasses.TCPService;
 
 import io.realm.Realm;
 import io.realm.RealmResults;

@@ -6,7 +6,7 @@
     android:id="@+id/cardLayout"
     android:baselineAligned="false">
 
-    <com.example.balint.szakdolgozat.RoundedImageView
+    <com.example.balint.szakdolgozat.javaclasses.RoundedImageView
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:src="@drawable/balazs"

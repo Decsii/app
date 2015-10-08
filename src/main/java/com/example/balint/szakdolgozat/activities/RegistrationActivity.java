@@ -1,4 +1,4 @@
-package com.example.balint.szakdolgozat;
+package com.example.balint.szakdolgozat.activities;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,11 +10,13 @@ import android.os.Message;
 import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+
+import com.example.balint.szakdolgozat.R;
+import com.example.balint.szakdolgozat.javaclasses.TCPService;
 
 
 public class RegistrationActivity extends ActionBarActivity {

@@ -1,4 +1,4 @@
-package com.example.balint.szakdolgozat;
+package com.example.balint.szakdolgozat.javaclasses;
 
 import android.app.Service;
 import android.content.Intent;
@@ -53,7 +53,7 @@ public class TCPService extends Service {
     private int numOfSended = 0;
     private List<Friend> sendedRequests = new ArrayList<>();
 
-    List<Pair<String, Integer>> messagesList = new ArrayList<>();
+    public List<Pair<String, Integer>> messagesList = new ArrayList<>();
 
     boolean friendS = false;
     int numOfFriends = 0;
@@ -61,7 +61,7 @@ public class TCPService extends Service {
     boolean requestS = false;
     int numOfRequests = 0;
 
-    int currentPartner;
+    public int currentPartner;
 
     private double timeS;
 
@@ -79,7 +79,7 @@ public class TCPService extends Service {
     private Queue<String> msgQ = new LinkedList<>();
 
     public class LocalBinder extends Binder {
-        TCPService getService() {
+        public TCPService getService() {
             return TCPService.this;
         }
     }

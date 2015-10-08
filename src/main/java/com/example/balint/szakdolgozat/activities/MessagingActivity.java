@@ -1,4 +1,4 @@
-package com.example.balint.szakdolgozat;
+package com.example.balint.szakdolgozat.activities;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -17,6 +17,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+
+import com.example.balint.szakdolgozat.javaclasses.DBMessage;
+import com.example.balint.szakdolgozat.javaclasses.MessageAdapter;
+import com.example.balint.szakdolgozat.R;
+import com.example.balint.szakdolgozat.javaclasses.TCPService;
 
 import java.util.ArrayList;
 import java.util.List;

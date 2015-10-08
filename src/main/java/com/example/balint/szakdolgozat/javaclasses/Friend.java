@@ -1,4 +1,4 @@
-package com.example.balint.szakdolgozat;
+package com.example.balint.szakdolgozat.javaclasses;
 
 /**
  * Created by Balint on 2015.08.29..

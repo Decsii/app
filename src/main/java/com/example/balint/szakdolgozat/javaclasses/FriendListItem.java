@@ -1,4 +1,4 @@
-package com.example.balint.szakdolgozat;
+package com.example.balint.szakdolgozat.javaclasses;
 
 import android.widget.BaseAdapter;
 

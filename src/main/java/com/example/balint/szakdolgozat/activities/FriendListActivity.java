@@ -1,4 +1,4 @@
-package com.example.balint.szakdolgozat;
+package com.example.balint.szakdolgozat.activities;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -14,20 +14,20 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.List;
+import com.example.balint.szakdolgozat.javaclasses.FriendListAdapter;
+import com.example.balint.szakdolgozat.javaclasses.FriendListItem;
+import com.example.balint.szakdolgozat.R;
+import com.example.balint.szakdolgozat.javaclasses.TCPService;
 
-import io.realm.Realm;
-import io.realm.RealmResults;
+import java.util.List;
 
 
 public class FriendListActivity extends ActionBarActivity {
