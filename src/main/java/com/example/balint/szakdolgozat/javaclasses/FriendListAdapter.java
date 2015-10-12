@@ -12,6 +12,9 @@ import com.example.balint.szakdolgozat.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
+
 /**
  * Created by Balint on 2015.09.22..
  */
@@ -71,10 +74,14 @@ public class FriendListAdapter extends BaseAdapter {
         txtMessage.setText(fli.get(i).getName());
 
         TextView txtMessage2 = (TextView) convertView.findViewById(R.id.lastMsgText);
-        txtMessage2.setText("");
+        if ( fli.get(i).getLstMsg() == "" ){
+            txtMessage2.setText("Nincs üzenet");
+        }else{
+            txtMessage2.setText(fli.get(i).getLstMsg());
+        }
 
         TextView txtMessage3 = (TextView) convertView.findViewById(R.id.timeText);
-        txtMessage3.setText("");
+        txtMessage3.setText(fli.get(i).getTime());
 
         return convertView;
     }

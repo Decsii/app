@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -118,6 +119,7 @@ public class FriendListActivity extends ActionBarActivity {
         super.onStart();
         Intent intent = new Intent(this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
+        startService(intent);
         this.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -143,6 +145,9 @@ public class FriendListActivity extends ActionBarActivity {
 
         Button btn2 = (Button) findViewById(R.id.addFriendB);
         btn2.setOnClickListener(addFriend);
+
+        Button btn4 = (Button) findViewById(R.id.addFriendV);
+        btn4.setOnClickListener(showAddFriend);
 
         Button btn3 = (Button) findViewById(R.id.writeFriendList);
         btn3.setOnClickListener(writeFriendListB);
@@ -231,6 +236,17 @@ public class FriendListActivity extends ActionBarActivity {
         }
     };
 
+    private View.OnClickListener showAddFriend = new View.OnClickListener() {
+        public void onClick(View v) {
+            LinearLayout laout = (LinearLayout) findViewById(R.id.addFriendField);
+            if (laout.getVisibility() != View.VISIBLE) {
+                laout.setVisibility(View.VISIBLE);
+            } else {
+                laout.setVisibility(View.GONE);
+            }
+        }
+    };
+
     private View.OnClickListener writeFriendListB = new View.OnClickListener() {
         public void onClick(View v) {
             writeFriendList();
@@ -257,8 +273,8 @@ public class FriendListActivity extends ActionBarActivity {
         //namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.user_list_item, friendList);
         //usersListView.setAdapter(namesArrayAdapter);
         fla.clearList();
-        for (String s : friendList) {
-            fla.addFriend(new FriendListItem("", s, "", ""));
+        for (FriendListItem s : tcps.getFriendList()) {
+            fla.addFriend(s);
         }
 
         usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -313,7 +329,7 @@ public class FriendListActivity extends ActionBarActivity {
         Intent intent = new Intent(FriendListActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
-        Log.d("","FRIEND REQUEST");
+        Log.d("", "FRIEND REQUEST");
         if (!tcps.requestedyet) tcps.requestFriendList();
     }
 }

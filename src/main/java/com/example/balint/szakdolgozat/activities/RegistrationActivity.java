@@ -67,6 +67,7 @@ public class RegistrationActivity extends ActionBarActivity {
         super.onStart();
         Intent intent = new Intent(this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
+        startService(intent);
         // Bind to LocalService
         this.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }

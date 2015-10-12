@@ -84,7 +84,7 @@ public class MessagingActivity extends ActionBarActivity {
         super.onStart();
         Intent intent = new Intent(this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
-
+        startService(intent);
         // Bind to LocalService
         this.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
@@ -180,21 +180,21 @@ public class MessagingActivity extends ActionBarActivity {
         //        .findAll();
 
         RealmResults<DBMessage> result2 = realm.where(DBMessage.class).findAll();
-        Log.d("",result2.toString());
-        Log.d("test1",tcps.currentPartner + " " + tcps.myId);
+        Log.d("", result2.toString());
+        Log.d("test1", tcps.currentPartner + " " + tcps.myId);
         RealmResults<DBMessage> result = realm.where(DBMessage.class)
                 .beginGroup()
-                    .equalTo("fromid", tcps.currentPartner)
-                    .equalTo("toid", tcps.myId)
+                .equalTo("fromid", tcps.currentPartner)
+                .equalTo("toid", tcps.myId)
                 .endGroup()
                 .or()
                 .beginGroup()
-                    .equalTo("fromid", tcps.myId)
-                    .equalTo("toid", tcps.currentPartner)
+                .equalTo("fromid", tcps.myId)
+                .equalTo("toid", tcps.currentPartner)
                 .endGroup()
                 .findAll();
 
-        Log.d("",result.toString());
+        Log.d("", result.toString());
         result.sort("msgid");
         List<String> asd = new ArrayList<>();
         List<Integer> asd2 = new ArrayList<>();

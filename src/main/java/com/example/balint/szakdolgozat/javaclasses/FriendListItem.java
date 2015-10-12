@@ -7,36 +7,53 @@ import android.widget.BaseAdapter;
  */
 public class FriendListItem {
 
-    String img;
-    String name;
-    String lstMsg;
-    String time;
-    final int type = 0;
+    //private String img;
+    private String name;
+    private String lstMsg;
+    private String time;
+    private int userid;
+    private final int type = 0;
 
-    public FriendListItem(String img, String name, String lstMsg, String time) {
-        this.img = img;
+    public FriendListItem(int userid, String name, String lstMsg, String time) {
         this.name = name;
         this.lstMsg = lstMsg;
         this.time = time;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public String getImg() {
-        return img;
+        this.userid = userid;
     }
 
     public String getName() {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getLstMsg() {
         return lstMsg;
     }
 
+    public void setLstMsg(String lstMsg) {
+        this.lstMsg = lstMsg;
+    }
+
     public String getTime() {
         return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public int getUserid() {
+        return userid;
+    }
+
+    public void setUserid(int userid) {
+        this.userid = userid;
+    }
+
+    public int getType() {
+        return type;
     }
 }

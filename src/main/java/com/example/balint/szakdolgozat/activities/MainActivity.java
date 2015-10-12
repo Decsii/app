@@ -87,11 +87,13 @@ public class MainActivity extends ActionBarActivity {
         super.onStart();
         Intent intent = new Intent(this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
+
+        startService(intent);
         this.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
         Realm realm = Realm.getInstance(this);
-       RealmResults<DBMessage> result = realm.where(DBMessage.class)
-               .findAll();
+        RealmResults<DBMessage> result = realm.where(DBMessage.class)
+                .findAll();
         //RealmResults<DBMessage> result = realm.where(DBMessage.class)
         //        .beginGroup()
         //        .equalTo("fromid", 26)
@@ -185,7 +187,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void onServiceReady() {
-        mBound = true;
         Intent intent = new Intent(MainActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
