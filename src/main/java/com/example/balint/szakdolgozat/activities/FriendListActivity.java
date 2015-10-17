@@ -281,7 +281,7 @@ public class FriendListActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int i, long l) {
                 Log.d(friendList.get(i), "" + i);
-                tcps.startConv(friendList.get(i));
+                tcps.startConv(friendList.get(i),fla.getLastActive(i), tcps.getFriendList().get(i).isLoggedin());
             }
         });
 

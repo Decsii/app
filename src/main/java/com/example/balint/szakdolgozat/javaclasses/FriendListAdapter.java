@@ -1,6 +1,7 @@
 package com.example.balint.szakdolgozat.javaclasses;
 
 import android.app.Activity;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,10 @@ public class FriendListAdapter extends BaseAdapter {
     public void addFriend(FriendListItem e) {
         fli.add(e);
         notifyDataSetChanged();
+    }
+
+    public long getLastActive(int i){
+        return fli.get(i).getLast_login();
     }
 
     public void clearList() {
@@ -71,8 +76,10 @@ public class FriendListAdapter extends BaseAdapter {
         //String name = fli.get(i).getName();
 
         TextView txtMessage = (TextView) convertView.findViewById(R.id.nameText);
-        txtMessage.setText(fli.get(i).getName());
-
+        txtMessage.setText( fli.get(i).getName() );
+        if( fli.get(i).isLoggedin() ) {
+            txtMessage.setTypeface(null, Typeface.BOLD);
+        }
         TextView txtMessage2 = (TextView) convertView.findViewById(R.id.lastMsgText);
         if ( fli.get(i).getLstMsg() == "" ){
             txtMessage2.setText("Nincs üzenet");

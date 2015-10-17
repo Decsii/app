@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.balint.szakdolgozat.javaclasses.DBMessage;
 import com.example.balint.szakdolgozat.javaclasses.MessageAdapter;
@@ -218,6 +219,10 @@ public class MessagingActivity extends ActionBarActivity {
         Intent intent = new Intent(MessagingActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
+        TextView tw = (TextView) findViewById(R.id.nameV);
+        TextView tw2 = (TextView) findViewById(R.id.lastV);
+        tw.setText(tcps.getCurrentPartnerName());
+        tw2.setText(tcps.getLastActive());
         populateMessageHistory();
     }
 

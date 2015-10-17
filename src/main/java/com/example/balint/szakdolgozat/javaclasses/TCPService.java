@@ -66,6 +66,9 @@ public class TCPService extends Service {
 
     public int currentPartner;
 
+    private String currentPartnerName;
+    private String lastActive;
+
     private double timeS;
 
     private int addFId;
@@ -120,19 +123,6 @@ public class TCPService extends Service {
                         dos = new DataOutputStream(socket.getOutputStream());
                         dis = new DataInputStream(socket.getInputStream());
                         startCommunication();
-                        //Thread thread2 = new Thread() {
-                        //    @Override
-                        //    public void run() {
-                        //        while (true) {
-                        //            try {
-                        //                Thread.sleep(1000);
-                        //            } catch (Exception e) {
-                        //                Log.d("", "INTERRUPTED");
-                        //            }
-                        //        }
-                        //    }
-                        //};
-                        //thread2.start();
                         break;
                     } catch (Exception e) {
                         try {
@@ -186,10 +176,8 @@ public class TCPService extends Service {
         }
 
         if (!type.equals("hiba")) {
-            JSONObject jsonObject = jsonRootObject.optJSONObject("userdata");
             JSONObject jObj;
             JSONArray jArr;
-
             switch (jsonRootObject.get("type").toString()) {
                 case "0":
                     JSONObject jo3 = jsonRootObject.optJSONObject("userdata");
@@ -237,6 +225,10 @@ public class TCPService extends Service {
                     if (friendS) {
                         requestedyet = true;
                         friendList.get(numOfFriends - 1).setName(jo2.getString("username"));
+                        friendList.get(numOfFriends - 1).setLast_login(jo2.getLong("last_login"));
+                        if( jsonRootObject.getInt("isloggedin") != 0 ){
+                            friendList.get(numOfFriends - 1).setLoggedin(true);
+                        }
                         if (friendList.size() == numOfFriends) {
                             friendS = false;
                             numOfFriends = 0;
@@ -271,7 +263,7 @@ public class TCPService extends Service {
                     requestListHandler(jsonRootObject.optJSONArray("requests"));
                     break;
                 case "10":
-                    Log.d("","üzenett jötttttttttttttt");
+                    Log.d("","üzenett jöt");
                     try {
                         Realm realm = Realm.getInstance(this);
                         jArr = jsonRootObject.optJSONArray("messages");
@@ -368,6 +360,7 @@ public class TCPService extends Service {
                         Realm realm = Realm.getInstance(this);
                         jObj = jsonRootObject.optJSONObject("message");
                         insertMessage(realm, jObj.getInt("from"), jObj.getString("msg"),jObj.getInt("msgid"), jObj.getDouble("t"), jObj.getInt("to"));
+                        setListItems();
                         sendMessage(13);
                     } catch (Exception e) {
                         Log.d("", "13 as error");
@@ -392,7 +385,7 @@ public class TCPService extends Service {
                 case "19" :
                     jArr = jsonRootObject.optJSONArray("messages");
                     Realm realm = Realm.getInstance(this);
-                    if( jArr.getJSONObject(0).getInt("to") == myId) {
+                    if( jArr.getJSONObject(0).getInt("from") == currentPartner ) {
                         insertMessage(realm, jArr.getJSONObject(0).getInt("from"), jArr.getJSONObject(0).getString("msg"),jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(0).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
                         msgQ.add(jArr.getJSONObject(0).getString("msg"));
                         sendMessage(16);
@@ -484,9 +477,11 @@ public class TCPService extends Service {
 
             for (DBMessage dbm : result) {
                if( dbm.getMsgid() == max ){
-                   long asd = (long)Math.floor(dbm.getT() + 0.5d);
+
+
+                   long asd = ((long)Math.floor(dbm.getT() + 0.5d))*1000 ;
                    Date date = new Date(asd);
-                   DateFormat formatter = new SimpleDateFormat("mm:ss");
+                   DateFormat formatter = new SimpleDateFormat("HH:mm");
                    String dateFormatted = formatter.format(date);
 
                    fli.setLstMsg(dbm.getMsg());
@@ -509,7 +504,7 @@ public class TCPService extends Service {
             requestS = true;
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject friendObject = jsonArray.getJSONObject(i);
-                friendRequests.add(new FriendListItem(friendObject.getInt("requestor"),"","",""));
+                friendRequests.add(new FriendListItem(friendObject.getInt("requestor"),"","","",false,0));
             }
 
             userInfoByID(friendRequests.get(numOfRequests).getUserid());
@@ -549,10 +544,10 @@ public class TCPService extends Service {
                 JSONObject friendObject = jsonArray.getJSONObject(i);
                 if (friendObject.getInt("user1") == myId) {
                     //friendList.add(new Friend(friendObject.getInt("user2")));
-                    friendList.add(new FriendListItem(friendObject.getInt("user2"),"","",""));
+                    friendList.add(new FriendListItem(friendObject.getInt("user2"),"","","",false,0));
                 } else {
                     //friendList.add(new Friend(friendObject.getInt("user1")));
-                    friendList.add(new FriendListItem(friendObject.getInt("user1"),"","",""));
+                    friendList.add(new FriendListItem(friendObject.getInt("user1"),"","","",false,0));
                 }
             }
             friendS = true;
@@ -844,9 +839,8 @@ public class TCPService extends Service {
         return str;
     }
 
-    public void startConv(String userName) {
+    public void startConv(String userName, long lastActive, boolean loggedin) {
         int userid = -1;
-
         int ind = 0;
         while (ind < friendList.size()) {
             if (friendList.get(ind).getName().equals(userName)) {
@@ -862,8 +856,34 @@ public class TCPService extends Service {
             return;
         }
         currentPartner = userid;
-        sendMessage(900);
+        currentPartnerName = userName;
 
+        //Date date = new Date(lastActive);
+        if (!loggedin) {
+            long currTime = System.currentTimeMillis() / 1000L;
+            long time = currTime - lastActive;
+
+            if (time >= 2592000) {
+                this.lastActive = "Utoljára bejelentkezve : 30 napnál régebben";
+            } else if (time >= 86400) {
+                int rounded = (int) Math.floor(time / 86400);
+                this.lastActive = "Utoljára bejelentkezve : " + rounded + " napja";
+            } else if (time >= 3600) {
+                int rounded = (int) Math.floor(time / 3600);
+                this.lastActive = "Utoljára bejelentkezve : " + rounded + " órája";
+            } else {
+                int rounded = (int) Math.floor(time / 60);
+                this.lastActive = "Utoljára bejelentkezve : " + rounded + " órája";
+            }
+        }else{
+            this.lastActive = "Éppen aktiv";
+        }
+        //Log.d("" + lastActive ,"" + currTime);
+
+       // DateFormat formatter = new SimpleDateFormat("HH:mm");
+        //String dateFormatted = formatter.format(date);
+
+        sendMessage(900);
     }
 
     public void receiveMsg(int n) {
@@ -915,6 +935,14 @@ public class TCPService extends Service {
         } catch (Exception e) {
             Log.d("hiba", "send hiba hiba ");
         }
+    }
+
+    public String getCurrentPartnerName() {
+        return currentPartnerName;
+    }
+
+    public String getLastActive() {
+        return lastActive;
     }
 
     public Queue<String> getMsgQ() {

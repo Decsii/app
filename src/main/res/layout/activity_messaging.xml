@@ -4,11 +4,35 @@
     android:layout_height="match_parent"
     >
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:id="@+id/lastV"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_vertical"
+        android:text="utoljára elérhető : 28 perce"
+        android:paddingLeft="10dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:id="@+id/nameV"
+        android:layout_below="@+id/lastV"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_vertical"
+        android:textStyle="bold"
+        android:text="Decsi Bálint"
+        android:textSize="30dp"
+        android:textColor="#000"
+        android:paddingLeft="10dp" />
+
     <ListView
         android:id="@+id/listMessages"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:transcriptMode="alwaysScroll"
+        android:layout_below="@+id/nameV"
         android:layout_above="@+id/divider"
         android:padding="0dip"
         android:divider="@null"
