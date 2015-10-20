@@ -1,14 +1,23 @@
 package com.example.balint.szakdolgozat.javaclasses;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.text.Spannable;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.util.Pair;
+
+import com.example.balint.szakdolgozat.R;
+import com.example.balint.szakdolgozat.activities.MessagingActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,9 +32,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -104,6 +117,10 @@ public class TCPService extends Service {
         super.onDestroy();
     }
 
+    NotificationManager nm;
+    Notification notification;
+    PendingIntent pending;
+    Intent notifIntent;
     @Override
     public void onCreate() {
         startTCP();
@@ -391,6 +408,18 @@ public class TCPService extends Service {
                         sendMessage(16);
                     }else{
                         insertMessage(realm, jArr.getJSONObject(0).getInt("from"), jArr.getJSONObject(0).getString("msg"),jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(0).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
+                        nm = (NotificationManager) getSystemService(this.NOTIFICATION_SERVICE);
+                        notifIntent = new Intent(this, MessagingActivity.class);
+                        notifIntent.putExtra("id", jArr.getJSONObject(0).getInt("from"));
+                        pending = PendingIntent.getActivity(this, 0, notifIntent, 0);
+                        notification = new Notification.Builder(this)
+                                .setContentTitle("Chat")
+                                .setContentText(jArr.getJSONObject(0).getString("msg")).setSmallIcon(R.drawable.ic_launcher)
+                                .setContentIntent(pending)
+                                .setWhen(System.currentTimeMillis())
+                                .setAutoCancel(true)
+                                .build();
+                        nm.notify(jArr.getJSONObject(0).getInt("from"), notification);
                     }
                     break;
             }
@@ -837,6 +866,18 @@ public class TCPService extends Service {
             str.add(s.getName());
         }
         return str;
+    }
+
+    public void setCurrentPartner(int currentPartner) {
+        this.currentPartner = currentPartner;
+    }
+
+    public void setCurrentPartnerName(String currentPartnerName) {
+        this.currentPartnerName = currentPartnerName;
+    }
+
+    public void setLastActive(String lastActive) {
+        this.lastActive = lastActive;
     }
 
     public void startConv(String userName, long lastActive, boolean loggedin) {

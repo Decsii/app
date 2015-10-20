@@ -329,6 +329,7 @@ public class FriendListActivity extends ActionBarActivity {
         Intent intent = new Intent(FriendListActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
+        tcps.setCurrentPartner(-1);
         Log.d("", "FRIEND REQUEST");
         if (!tcps.requestedyet) tcps.requestFriendList();
     }

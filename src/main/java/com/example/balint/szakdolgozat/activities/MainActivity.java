@@ -1,5 +1,8 @@
 package com.example.balint.szakdolgozat.activities;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -32,7 +35,6 @@ public class MainActivity extends ActionBarActivity {
     private boolean mBound = false;
     private Handler messageHandler = new MessageHandler();
 
-    private Realm realm;
 
     public class MessageHandler extends Handler {
         @Override
@@ -190,6 +192,11 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = new Intent(MainActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
+        proba();
+    }
+
+    public void proba() {
+
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.balint.szakdolgozat.activities;
 
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,8 @@ import android.os.IBinder;
 import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
@@ -20,12 +23,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.balint.szakdolgozat.javaclasses.DBMessage;
+import com.example.balint.szakdolgozat.javaclasses.FriendListItem;
 import com.example.balint.szakdolgozat.javaclasses.MessageAdapter;
 import com.example.balint.szakdolgozat.R;
 import com.example.balint.szakdolgozat.javaclasses.TCPService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -203,6 +211,9 @@ public class MessagingActivity extends ActionBarActivity {
             asd.add(msg.getMsg());
             asd2.add(msg.getFromid());
         }
+
+        //Spannable sp = getSmiledText(this,"asd");
+
         Log.d("", asd.toString());
         for (int i = 0; i < asd.size(); i++) {
             String message = asd.get(i);
@@ -215,15 +226,76 @@ public class MessagingActivity extends ActionBarActivity {
     }
 
     private void onServiceReady() {
+        Intent intent;
         mBound = true;
-        Intent intent = new Intent(MessagingActivity.this, TCPService.class);
+        intent = new Intent(MessagingActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
+
+        intent = getIntent();
+        int id = intent.getIntExtra("id",-1);
+
+        if ( id != -1 ){
+            //start conv cucait beállitjuk
+            List<FriendListItem> friends = tcps.getFriendList();
+            for( FriendListItem f : friends ){
+                if ( id == f.getUserid() ){
+                    tcps.setCurrentPartner(id);
+                    tcps.setCurrentPartnerName(f.getName());
+                    tcps.setLastActive(f.getTime());
+                }
+            }
+        }
+
         TextView tw = (TextView) findViewById(R.id.nameV);
         TextView tw2 = (TextView) findViewById(R.id.lastV);
         tw.setText(tcps.getCurrentPartnerName());
         tw2.setText(tcps.getLastActive());
         populateMessageHistory();
+    }
+
+    private final Spannable.Factory spannableFactory = Spannable.Factory.getInstance();
+    private static final Map<Pattern, Integer> emoticons = new HashMap<Pattern, Integer>();
+
+    {
+        addPattern(emoticons, ":)", R.drawable.emo_im_happy);
+        addPattern(emoticons, ":-)", R.drawable.emo_im_happy);
+    }
+
+    private void addPattern(Map<Pattern, Integer> map, String smile, int resource) {
+        map.put(Pattern.compile(Pattern.quote(smile)), resource);
+    }
+
+    public boolean addSmiles(Context context, Spannable spannable) {
+        boolean hasChanges = false;
+        for (Map.Entry<Pattern, Integer> entry : emoticons.entrySet()) {
+            Matcher matcher = entry.getKey().matcher(spannable);
+            while (matcher.find()) {
+                boolean set = true;
+                for (ImageSpan span : spannable.getSpans(matcher.start(),
+                        matcher.end(), ImageSpan.class))
+                    if (spannable.getSpanStart(span) >= matcher.start()
+                            && spannable.getSpanEnd(span) <= matcher.end())
+                        spannable.removeSpan(span);
+                    else {
+                        set = false;
+                        break;
+                    }
+                if (set) {
+                    hasChanges = true;
+                    spannable.setSpan(new ImageSpan( context , entry.getValue()),
+                            matcher.start(), matcher.end(),
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+            }
+        }
+        return hasChanges;
+    }
+
+    public Spannable getSmiledText(Context context, CharSequence text) {
+        Spannable spannable = spannableFactory.newSpannable(text);
+        addSmiles(context, spannable);
+        return spannable;
     }
 
 }
