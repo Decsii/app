@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -13,6 +14,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.text.Spannable;
 import android.text.style.ImageSpan;
+import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
 
@@ -23,11 +25,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,6 +43,13 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -402,24 +413,32 @@ public class TCPService extends Service {
                 case "19" :
                     jArr = jsonRootObject.optJSONArray("messages");
                     Realm realm = Realm.getInstance(this);
+                    String message = "";
+                    try {
+                        message = decrypt(jArr.getJSONObject(0).getString("msg"));
+                    }catch(Exception e){
+                        Log.d("HIba","decrypt hiba");
+                        return;
+                    }
+                    Log.d("message", message);
                     if( jArr.getJSONObject(0).getInt("from") == currentPartner ) {
-                        insertMessage(realm, jArr.getJSONObject(0).getInt("from"), jArr.getJSONObject(0).getString("msg"),jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(0).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
-                        msgQ.add(jArr.getJSONObject(0).getString("msg"));
+                        insertMessage(realm, jArr.getJSONObject(0).getInt("from"), message,jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(0).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
+                        msgQ.add(message);
                         sendMessage(16);
                     }else{
-                        insertMessage(realm, jArr.getJSONObject(0).getInt("from"), jArr.getJSONObject(0).getString("msg"),jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(0).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
-                        nm = (NotificationManager) getSystemService(this.NOTIFICATION_SERVICE);
-                        notifIntent = new Intent(this, MessagingActivity.class);
-                        notifIntent.putExtra("id", jArr.getJSONObject(0).getInt("from"));
-                        pending = PendingIntent.getActivity(this, 0, notifIntent, 0);
-                        notification = new Notification.Builder(this)
-                                .setContentTitle("Chat")
-                                .setContentText(jArr.getJSONObject(0).getString("msg")).setSmallIcon(R.drawable.ic_launcher)
-                                .setContentIntent(pending)
-                                .setWhen(System.currentTimeMillis())
-                                .setAutoCancel(true)
-                                .build();
-                        nm.notify(jArr.getJSONObject(0).getInt("from"), notification);
+                        insertMessage(realm, jArr.getJSONObject(0).getInt("from"), message,jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(0).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
+                        //nm = (NotificationManager) getSystemService(this.NOTIFICATION_SERVICE);
+                        //notifIntent = new Intent(this, MessagingActivity.class);
+                        //notifIntent.putExtra("id", jArr.getJSONObject(0).getInt("from"));
+                        //pending = PendingIntent.getActivity(this, 0, notifIntent, 0);
+                        //notification = new Notification.Builder(this)
+                        //        .setContentTitle("Chat")
+                        //        .setContentText(message).setSmallIcon(R.drawable.ic_launcher)
+                        //        .setContentIntent(pending)
+                        //        .setWhen(System.currentTimeMillis())
+                        //        .setAutoCancel(true)
+                        //        .build();
+                        //nm.notify(jArr.getJSONObject(0).getInt("from"), notification);
                     }
                     break;
             }
@@ -964,12 +983,46 @@ public class TCPService extends Service {
         }
     }
 
+    public String encrypt(String msg)  throws Exception{
+        DESKeySpec keySpec = new DESKeySpec("12345678".getBytes("UTF8"));
+        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
+        SecretKey key = keyFactory.generateSecret(keySpec);
+        // ENCODE plainTextPassword String
+        byte[] cleartext = msg.getBytes("UTF8");
+
+        Cipher cipher = Cipher.getInstance("DES"); // cipher is not thread safe
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        //String encryptedPwd = base64encoder.encode(cipher.doFinal(cleartext));
+        String encryptedPwd = Base64.encodeToString(cipher.doFinal(cleartext), Base64.DEFAULT);
+
+        return encryptedPwd;
+    }
+
+    public String decrypt(String msg) throws Exception{
+        DESKeySpec keySpec = new DESKeySpec("12345678".getBytes("UTF8"));
+        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
+        SecretKey key = keyFactory.generateSecret(keySpec);
+
+        // DECODE encryptedPwd String
+        //byte[] encrypedPwdBytes = base64decoder.decodeBuffer(msg);
+        byte[] encrypedPwdBytes = Base64.decode(msg, Base64.DEFAULT);
+
+        Cipher cipher = Cipher.getInstance("DES");// cipher is not thread safe
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        byte[] plainTextPwdBytes = (cipher.doFinal(encrypedPwdBytes));
+
+        return new String(plainTextPwdBytes);
+    }
+
     public void send(String message) {
         //{"type":13, "userid":17,"msg":"Szia! Ez egy tesztüzenet."}
-
-        String msg = "{\"type\":13, \"userid\":" + currentPartner + ",\"msg\":\"" + message + "\"}";
-        byte[] bytes = msg.getBytes();
         try {
+            String enc = encrypt(message);
+            String text = enc.replace("\n", "").replace("\r", "");
+            String msg = "{\"type\":13, \"userid\":" + currentPartner + ",\"msg\":\"" + text + "\"}";
+            Log.d("message", msg);
+            Log.d("message", enc.getBytes() + "");
+            byte[] bytes = msg.getBytes();
             dos.writeInt(bytes.length);
             dos.write(bytes);
             dos.flush();
@@ -989,4 +1042,5 @@ public class TCPService extends Service {
     public Queue<String> getMsgQ() {
         return msgQ;
     }
+
 }

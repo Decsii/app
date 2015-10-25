@@ -8,6 +8,7 @@
     <string name="title_activity_registration">RegistrationActivity</string>
     <string name="title_activity_friend_list">FriendListActivity</string>
     <string name="message_elipses">Message...</string>
+    <string name="title_activity_profile">ProfileActivity</string>
 
 </resources>
 

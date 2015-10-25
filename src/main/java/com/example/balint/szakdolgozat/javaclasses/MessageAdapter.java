@@ -30,15 +30,15 @@ public class MessageAdapter extends BaseAdapter {
     public static final int DIRECTION_INCOMING = 0;
     public static final int DIRECTION_OUTGOING = 1;
 
-    private List<Pair<String, Integer>> messages;
+    private List<Pair<Spannable, Integer>> messages;
     private LayoutInflater layoutInflater;
 
     public MessageAdapter(Activity activity) {
         layoutInflater = activity.getLayoutInflater();
-        messages = new ArrayList<Pair<String, Integer>>();
+        messages = new ArrayList<Pair<Spannable, Integer>>();
     }
 
-    public void addMessage(String message, int direction) {
+    public void addMessage(Spannable message, int direction) {
         messages.add(new Pair(message, direction));
         notifyDataSetChanged();
     }
@@ -84,7 +84,7 @@ public class MessageAdapter extends BaseAdapter {
             convertView = layoutInflater.inflate(res, viewGroup, false);
         }
 
-        String message = messages.get(i).first;
+        Spannable message = messages.get(i).first;
 
         TextView txtMessage = (TextView) convertView.findViewById(R.id.txtMessage);
         txtMessage.setText(message);

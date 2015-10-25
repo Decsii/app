@@ -1,0 +1,102 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1"
+    android:baselineAligned="false">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:gravity="center_horizontal"
+        android:id="@+id/mainLy"
+        android:layout_marginTop="10dp">
+
+        <com.example.balint.szakdolgozat.javaclasses.RoundedImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/balazs"
+            android:id="@+id/imageView"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:id="@+id/textView"
+        android:textSize="35dp"
+        android:text="Decsi Bálint"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="AASFASDFS"
+            android:gravity="center_vertical"
+            android:id="@+id/textView2"
+            android:layout_weight="1" />
+
+        <Switch
+            android:layout_width="70dp"
+            android:layout_height="30dp"
+            android:text="New Switch"
+            android:id="@+id/switch1"
+            android:layout_gravity="center_vertical"
+            android:checked="true" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="SDFSDF"
+            android:gravity="center_vertical"
+            android:id="@+id/textView3"
+            android:layout_weight="1" />
+
+        <Switch
+            android:layout_width="70dp"
+            android:layout_height="30dp"
+            android:text="New Switch"
+            android:id="@+id/switch3"
+            android:layout_gravity="center_vertical"
+            android:checked="false" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:gravity="center_vertical"
+            android:text="SADFSDA"
+            android:id="@+id/textView4"
+            android:layout_weight="1" />
+
+        <Switch
+            android:layout_width="70dp"
+            android:layout_height="30dp"
+            android:text="New Switch"
+            android:id="@+id/switch4"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+
+</LinearLayout>

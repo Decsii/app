@@ -152,6 +152,9 @@ public class FriendListActivity extends ActionBarActivity {
         Button btn3 = (Button) findViewById(R.id.writeFriendList);
         btn3.setOnClickListener(writeFriendListB);
 
+        Button btn5 = (Button) findViewById(R.id.profileB);
+        btn5.setOnClickListener(profileA);
+
         //Button btn4 = (Button) findViewById(R.id.writeSended);
         //btn4.setOnClickListener(writeSendedB);
     }
@@ -233,6 +236,15 @@ public class FriendListActivity extends ActionBarActivity {
     private View.OnClickListener requestB = new View.OnClickListener() {
         public void onClick(View v) {
             writeRequests();
+        }
+    };
+
+    private View.OnClickListener profileA = new View.OnClickListener() {
+        public void onClick(View v) {
+            Intent intent = new Intent(FriendListActivity.this, ProfileActivity.class);
+            String uz = "nomsg";
+            intent.putExtra(EXTRA_MESSAGE, uz);
+            startActivity(intent);
         }
     };
 

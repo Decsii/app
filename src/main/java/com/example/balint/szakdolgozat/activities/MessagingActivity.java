@@ -150,7 +150,8 @@ public class MessagingActivity extends ActionBarActivity {
             if (messageF.getText().toString() != "") {
                 tcps.send(messageF.getText().toString());
                 messageList.add(messageF.getText().toString());
-                messageAdapter.addMessage(messageF.getText().toString(), MessageAdapter.DIRECTION_OUTGOING);
+                Spannable sp = getSmiledText(MessagingActivity.this,messageF.getText());
+                messageAdapter.addMessage(sp, MessageAdapter.DIRECTION_OUTGOING);
                 tcps.messagesList.add(new Pair(messageF.getText().toString(), 1));
                 messageF.setText("");
             }
@@ -158,8 +159,8 @@ public class MessagingActivity extends ActionBarActivity {
     };
 
     private void msgRecieved() {
-
-        messageAdapter.addMessage(tcps.getMsgQ().poll(), MessageAdapter.DIRECTION_INCOMING);
+        Spannable sp = getSmiledText(this,tcps.getMsgQ().poll());
+        messageAdapter.addMessage(sp, MessageAdapter.DIRECTION_INCOMING);
         //List<String> asd = new ArrayList<>();
         //List<Integer> asd2 = new ArrayList<>();
         //for (DBMessage msg : result) {
@@ -212,15 +213,15 @@ public class MessagingActivity extends ActionBarActivity {
             asd2.add(msg.getFromid());
         }
 
-        //Spannable sp = getSmiledText(this,"asd");
 
         Log.d("", asd.toString());
         for (int i = 0; i < asd.size(); i++) {
             String message = asd.get(i);
+            Spannable sp = getSmiledText(this,message);
             if (tcps.myId == asd2.get(i)) {
-                messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
+                messageAdapter.addMessage(sp, MessageAdapter.DIRECTION_OUTGOING);
             } else {
-                messageAdapter.addMessage(message, MessageAdapter.DIRECTION_INCOMING);
+                messageAdapter.addMessage(sp, MessageAdapter.DIRECTION_INCOMING);
             }
         }
     }
@@ -258,8 +259,11 @@ public class MessagingActivity extends ActionBarActivity {
     private static final Map<Pattern, Integer> emoticons = new HashMap<Pattern, Integer>();
 
     {
-        addPattern(emoticons, ":)", R.drawable.emo_im_happy);
-        addPattern(emoticons, ":-)", R.drawable.emo_im_happy);
+        addPattern(emoticons, ":)", R.drawable.smile_emo);
+        addPattern(emoticons, ":D", R.drawable.happy_emo);
+        addPattern(emoticons, "<3", R.drawable.heart_emo);
+        addPattern(emoticons, ":DD", R.drawable.lol_emo);
+        addPattern(emoticons, ":(", R.drawable.sad_emo);
     }
 
     private void addPattern(Map<Pattern, Integer> map, String smile, int resource) {
