@@ -1,7 +1,13 @@
 package com.example.balint.szakdolgozat.javaclasses;
 
 import android.app.Activity;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +15,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.example.balint.szakdolgozat.R;
+import com.example.balint.szakdolgozat.activities.FriendListActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +30,10 @@ public class FriendListAdapter extends BaseAdapter {
 
     private LayoutInflater layoutInflater;
     private List<FriendListItem> fli;
+    Activity context;
 
     public FriendListAdapter(Activity activity) {
+        context = activity;
         layoutInflater = activity.getLayoutInflater();
         fli = new ArrayList<>();
     }
@@ -89,6 +98,12 @@ public class FriendListAdapter extends BaseAdapter {
 
         TextView txtMessage3 = (TextView) convertView.findViewById(R.id.timeText);
         txtMessage3.setText(fli.get(i).getTime());
+
+        //if( fli.get(i).getUserid() == 1055 ){
+        //    RoundedImageView p = (RoundedImageView) convertView.findViewById(R.id.imgView);
+        //    Drawable d =  ContextCompat.getDrawable(context, R.drawable.pet);
+        //    p.setImageDrawable(d);
+        //}
 
         return convertView;
     }

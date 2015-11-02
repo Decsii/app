@@ -25,10 +25,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.SecureRandom;
@@ -132,13 +137,62 @@ public class TCPService extends Service {
     Notification notification;
     PendingIntent pending;
     Intent notifIntent;
+
+    public String asd;
+    private boolean enableNotif;
+    private boolean notifSound;
+    private boolean notifVibrate;
+    private boolean sendWithEnter;
+
     @Override
     public void onCreate() {
+        //getOptions();
         startTCP();
     }
+/*
+    private void writeToFile(String data) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(openFileOutput("config.txt", Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
 
+    private String readFromFile() {
+
+        String ret = "";
+
+        try {
+            InputStream inputStream = openFileInput("config.txt");
+
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+                    stringBuilder.append(receiveString);
+                }
+
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        }
+        catch (FileNotFoundException e) {
+            Log.e("login activity", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+        }
+
+        return ret;
+    }
+*/
     public void startTCP() {
-        Log.d("","SeERVICE START");
+        Log.d("", "SeERVICE START");
         Thread t1 = new Thread() {
             public void run() {
                 while (true) {
@@ -387,7 +441,7 @@ public class TCPService extends Service {
                     try {
                         Realm realm = Realm.getInstance(this);
                         jObj = jsonRootObject.optJSONObject("message");
-                        insertMessage(realm, jObj.getInt("from"), jObj.getString("msg"),jObj.getInt("msgid"), jObj.getDouble("t"), jObj.getInt("to"));
+                        insertMessage(realm, jObj.getInt("from"), decrypt(jObj.getString("msg")),jObj.getInt("msgid"), jObj.getDouble("t"), jObj.getInt("to"));
                         setListItems();
                         sendMessage(13);
                     } catch (Exception e) {
@@ -1043,4 +1097,78 @@ public class TCPService extends Service {
         return msgQ;
     }
 
+    private void getOptions(){
+        Realm realm = Realm.getInstance(this);
+        RealmResults<Options> result = realm.where(Options.class)
+                .equalTo("key", "notification")
+                .findAll();
+
+        if ( result.size() == 0 ){
+            realm.beginTransaction();
+            Options option = realm.createObject(Options.class);
+            option.setKey("notification");
+            option.setValue("1");
+            realm.commitTransaction();
+        }else{
+            if ( result.get(0).getValue() == "0" ) {
+                enableNotif = false;
+            }else{
+                enableNotif = true;
+            }
+        }
+
+        result = realm.where(Options.class)
+                .equalTo("key", "notifsound")
+                .findAll();
+
+        if ( result.size() == 0 ){
+            realm.beginTransaction();
+            Options option = realm.createObject(Options.class);
+            option.setKey("notifsound");
+            option.setValue("1");
+            realm.commitTransaction();
+        }else{
+            if ( result.get(0).getValue() == "0" ) {
+                notifSound = false;
+            }else{
+                notifSound = true;
+            }
+        }
+
+        result = realm.where(Options.class)
+                .equalTo("key", "notifvibrate")
+                .findAll();
+
+        if ( result.size() == 0 ){
+            realm.beginTransaction();
+            Options option = realm.createObject(Options.class);
+            option.setKey("notifvibrate");
+            option.setValue("1");
+            realm.commitTransaction();
+        }else{
+            if ( result.get(0).getValue() == "0" ) {
+                notifVibrate = false;
+            }else{
+                notifVibrate = true;
+            }
+        }
+
+        result = realm.where(Options.class)
+                .equalTo("key", "sendwithenter")
+                .findAll();
+
+        if ( result.size() == 0 ){
+            realm.beginTransaction();
+            Options option = realm.createObject(Options.class);
+            option.setKey("sendwithenter");
+            option.setValue("1");
+            realm.commitTransaction();
+        }else{
+            if ( result.get(0).getValue() == "0" ) {
+                sendWithEnter = false;
+            }else{
+                sendWithEnter = true;
+            }
+        }
+    }
 }

@@ -107,7 +107,7 @@ public class MainActivity extends ActionBarActivity {
         //        .equalTo("toid", 26)
         //        .endGroup()
         //        .findAll();
-        Log.d("result", result.toString());
+        //Log.d("result", result.toString());
         //realm.beginTransaction();
         //result.clear();
         //realm.commitTransaction();
@@ -192,6 +192,8 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = new Intent(MainActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
+        EditText userName = (EditText) findViewById(R.id.usernameText);
+        userName.setText(tcps.asd);
         proba();
     }
 

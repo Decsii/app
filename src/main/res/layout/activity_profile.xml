@@ -33,10 +33,10 @@
         android:layout_gravity="center_horizontal">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="AASFASDFS"
+            android:text="Notification"
             android:gravity="center_vertical"
             android:id="@+id/textView2"
             android:layout_weight="1" />
@@ -44,10 +44,9 @@
         <Switch
             android:layout_width="70dp"
             android:layout_height="30dp"
-            android:text="New Switch"
-            android:id="@+id/switch1"
+            android:id="@+id/notifS"
             android:layout_gravity="center_vertical"
-            android:checked="true" />
+            android:checked="false" />
     </LinearLayout>
 
 
@@ -61,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="SDFSDF"
+            android:text="Notification sound"
             android:gravity="center_vertical"
             android:id="@+id/textView3"
             android:layout_weight="1" />
@@ -69,8 +68,7 @@
         <Switch
             android:layout_width="70dp"
             android:layout_height="30dp"
-            android:text="New Switch"
-            android:id="@+id/switch3"
+            android:id="@+id/soundS"
             android:layout_gravity="center_vertical"
             android:checked="false" />
     </LinearLayout>
@@ -87,16 +85,39 @@
             android:layout_height="fill_parent"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:gravity="center_vertical"
-            android:text="SADFSDA"
+            android:text="Notification vibrate"
             android:id="@+id/textView4"
             android:layout_weight="1" />
 
         <Switch
             android:layout_width="70dp"
             android:layout_height="30dp"
-            android:text="New Switch"
-            android:id="@+id/switch4"
-            android:layout_gravity="center_vertical" />
+            android:id="@+id/vibrateS"
+            android:layout_gravity="center_vertical"
+            android:checked="false" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:gravity="center_vertical"
+            android:text="Send with enter"
+            android:id="@+id/textView5"
+            android:layout_weight="1" />
+
+        <Switch
+            android:layout_width="70dp"
+            android:layout_height="30dp"
+            android:id="@+id/sendS"
+            android:layout_gravity="center_vertical"
+            android:checked="false" />
     </LinearLayout>
 
 </LinearLayout>
