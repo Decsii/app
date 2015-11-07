@@ -1,6 +1,5 @@
 package com.example.balint.szakdolgozat.activities;
 
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +25,6 @@ import com.example.balint.szakdolgozat.javaclasses.DBMessage;
 import com.example.balint.szakdolgozat.javaclasses.FriendListItem;
 import com.example.balint.szakdolgozat.javaclasses.MessageAdapter;
 import com.example.balint.szakdolgozat.R;
-import com.example.balint.szakdolgozat.javaclasses.TCPService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -103,6 +101,7 @@ public class MessagingActivity extends ActionBarActivity {
         super.onStop();
         // Unbind from the service
         if (mBound) {
+            tcps.setCurrentPartner(-1);
             unbindService(mConnection);
             mBound = false;
         }

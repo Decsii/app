@@ -26,7 +26,6 @@ import android.widget.Toast;
 import com.example.balint.szakdolgozat.javaclasses.FriendListAdapter;
 import com.example.balint.szakdolgozat.javaclasses.FriendListItem;
 import com.example.balint.szakdolgozat.R;
-import com.example.balint.szakdolgozat.javaclasses.TCPService;
 
 import java.util.List;
 
@@ -89,6 +88,9 @@ public class FriendListActivity extends ActionBarActivity {
                 case 10:
                     writeFriendList();
                     break;
+                case 200:
+                    refreshFriendItem();
+                    break;
                 case 900:
                     intent = new Intent(FriendListActivity.this, MessagingActivity.class);
                     uz = "nomsg";
@@ -127,6 +129,7 @@ public class FriendListActivity extends ActionBarActivity {
     protected void onStop() {
         super.onStop();
         if (mBound) {
+            tcps.setFriendListActive(false);
             unbindService(mConnection);
             mBound = false;
         }
@@ -336,13 +339,27 @@ public class FriendListActivity extends ActionBarActivity {
         registerForContextMenu(usersListView);
     }
 
+    private boolean listIsAtTop()   {
+        if(usersListView.getChildCount() == 0) return true;
+        return usersListView.getChildAt(0).getTop() == 0;
+    }
+
+    private void refreshFriendItem(){
+        fla.refreshFriend(tcps.getRefreshQ().poll());
+    }
+
     private void onServiceReady() {
         mBound = true;
         Intent intent = new Intent(FriendListActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
         tcps.setCurrentPartner(-1);
+        tcps.setFriendListActive(true);
         Log.d("", "FRIEND REQUEST");
-        if (!tcps.requestedyet) tcps.requestFriendList();
+        if (!tcps.requestedyet){
+            tcps.requestFriendList();
+        }else{
+            writeFriendList();
+        }
     }
 }

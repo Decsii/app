@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,11 @@ public class FriendListAdapter extends BaseAdapter {
         fli.add(e);
         notifyDataSetChanged();
     }
+
+    public void refreshFriend(Pair<Integer,FriendListItem> pair){
+        fli.set(pair.first,pair.second);
+        notifyDataSetChanged();
+    };
 
     public long getLastActive(int i){
         return fli.get(i).getLast_login();

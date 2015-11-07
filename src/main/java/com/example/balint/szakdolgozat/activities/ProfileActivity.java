@@ -4,20 +4,20 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
 import com.example.balint.szakdolgozat.R;
 import com.example.balint.szakdolgozat.javaclasses.Options;
-import com.example.balint.szakdolgozat.javaclasses.TCPService;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -33,7 +33,84 @@ public class ProfileActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+    }
+
+    private void swtichInit(){
         Switch s1 = (Switch) findViewById(R.id.notifS);
+        s1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Realm realm = Realm.getInstance(ProfileActivity.this);
+                RealmResults<Options> result = realm.where(Options.class)
+                        .equalTo("key", "notification")
+                        .findAll();
+                if(isChecked){
+                    realm.beginTransaction();
+                    result.get(0).setValue("1");
+                    realm.commitTransaction();
+                }else{
+                    realm.beginTransaction();
+                    result.get(0).setValue("0");
+                    realm.commitTransaction();
+                }
+            }
+        });
+
+        Switch s2 = (Switch) findViewById(R.id.soundS);
+        s2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Realm realm = Realm.getInstance(ProfileActivity.this);
+                RealmResults<Options> result = realm.where(Options.class)
+                        .equalTo("key", "notifsound")
+                        .findAll();
+                if(isChecked){
+                    realm.beginTransaction();
+                    result.get(0).setValue("1");
+                    realm.commitTransaction();
+                }else{
+                    realm.beginTransaction();
+                    result.get(0).setValue("0");
+                    realm.commitTransaction();
+                }
+            }
+        });
+
+        Switch s3 = (Switch) findViewById(R.id.vibrateS);
+        s3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Realm realm = Realm.getInstance(ProfileActivity.this);
+                RealmResults<Options> result = realm.where(Options.class)
+                        .equalTo("key", "notifvibrate")
+                        .findAll();
+                if(isChecked){
+                    realm.beginTransaction();
+                    result.get(0).setValue("1");
+                    realm.commitTransaction();
+                }else{
+                    realm.beginTransaction();
+                    result.get(0).setValue("0");
+                    realm.commitTransaction();
+                }
+            }
+        });
+
+        Switch s4 = (Switch) findViewById(R.id.sendS);
+        s4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Realm realm = Realm.getInstance(ProfileActivity.this);
+                RealmResults<Options> result = realm.where(Options.class)
+                        .equalTo("key", "sendwithenter")
+                        .findAll();
+                if(isChecked){
+                    realm.beginTransaction();
+                    result.get(0).setValue("1");
+                    realm.commitTransaction();
+                }else{
+                    realm.beginTransaction();
+                    result.get(0).setValue("0");
+                    realm.commitTransaction();
+                }
+            }
+        });
 
     }
 
@@ -78,6 +155,16 @@ public class ProfileActivity extends ActionBarActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_profile, menu);
@@ -115,7 +202,7 @@ public class ProfileActivity extends ActionBarActivity {
                 .findAll();
 
         if( result.size() != 0 ) {
-            if( result.get(0).getValue() == "0" ) {
+            if(  result.get(0).getValue().toString().equals("0")) {
                 s1.setChecked(false);
             }else{
                 s1.setChecked(true);
@@ -132,9 +219,10 @@ public class ProfileActivity extends ActionBarActivity {
         result = realm.where(Options.class)
                 .equalTo("key", "notifsound")
                 .findAll();
-
+        Log.d("RESULT", result.size() + result.toString());
         if( result.size() != 0 ) {
-            if( result.get(0).getValue() == "0" ) {
+            if(result.get(0).getValue().equals("0")) {
+                Log.d("RESULT2","FÓÓLSZ");
                 s2.setChecked(false);
             }else{
                 s2.setChecked(true);
@@ -153,7 +241,7 @@ public class ProfileActivity extends ActionBarActivity {
                 .findAll();
 
         if( result.size() != 0 ) {
-            if( result.get(0).getValue() == "0" ) {
+            if( result.get(0).getValue().toString().equals("0")) {
                 s3.setChecked(false);
             }else{
                 s3.setChecked(true);
@@ -172,7 +260,7 @@ public class ProfileActivity extends ActionBarActivity {
                 .findAll();
 
         if( result.size() != 0 ) {
-            if( result.get(0).getValue() == "0" ) {
+            if(  result.get(0).getValue().toString().equals("0") ) {
                 s4.setChecked(false);
             }else{
                 s4.setChecked(true);
@@ -185,6 +273,6 @@ public class ProfileActivity extends ActionBarActivity {
             option.setValue("1");
             realm.commitTransaction();
         }
+        swtichInit();
     }
-
 }

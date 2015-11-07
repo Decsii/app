@@ -1,8 +1,5 @@
 package com.example.balint.szakdolgozat.activities;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +9,6 @@ import android.os.IBinder;
 import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +18,6 @@ import android.widget.Toast;
 
 import com.example.balint.szakdolgozat.javaclasses.DBMessage;
 import com.example.balint.szakdolgozat.R;
-import com.example.balint.szakdolgozat.javaclasses.TCPService;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -192,8 +187,6 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = new Intent(MainActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
-        EditText userName = (EditText) findViewById(R.id.usernameText);
-        userName.setText(tcps.asd);
         proba();
     }
 

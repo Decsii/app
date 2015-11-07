@@ -16,8 +16,7 @@ public class FriendListItem {
     private boolean loggedin;
     private final int type = 0;
 
-    public FriendListItem(int userid, String name, String lstMsg, String time, boolean loggedin, long last_login
-    ) {
+    public FriendListItem(int userid, String name, String lstMsg, String time, boolean loggedin, long last_login) {
         this.name = name;
         this.lstMsg = lstMsg;
         this.time = time;

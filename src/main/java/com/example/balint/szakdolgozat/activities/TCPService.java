@@ -1,60 +1,48 @@
-package com.example.balint.szakdolgozat.javaclasses;
+package com.example.balint.szakdolgozat.activities;
 
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.text.Spannable;
-import android.text.style.ImageSpan;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
 
 import com.example.balint.szakdolgozat.R;
-import com.example.balint.szakdolgozat.activities.MessagingActivity;
+import com.example.balint.szakdolgozat.javaclasses.DBMessage;
+import com.example.balint.szakdolgozat.javaclasses.Friend;
+import com.example.balint.szakdolgozat.javaclasses.FriendListItem;
+import com.example.balint.szakdolgozat.javaclasses.Options;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -68,7 +56,7 @@ public class TCPService extends Service {
     private final IBinder mBinder = new LocalBinder();
     public final static String EXTRA_MESSAGE = "com.example.balint.szakdolgozat.MESSAGE";
 
-    public Socket socket;
+    public Socket socket = null;
     private DataOutputStream dos;
     private DataInputStream dis;
 
@@ -98,27 +86,26 @@ public class TCPService extends Service {
     private String currentPartnerName;
     private String lastActive;
 
-    private double timeS;
 
     private int addFId;
     private String addFName;
 
-    private boolean byebye = false;
     private int messagesArrived;
-    String currUz;
 
     public boolean requestedyet = false;
 
     private List<Integer> leftList = new ArrayList<>();
 
     private Queue<String> msgQ = new LinkedList<>();
+    private Queue<Pair<Integer,FriendListItem>> refreshQ = new LinkedList<>();
+
+    private boolean friendListActive = false;
 
     public class LocalBinder extends Binder {
         public TCPService getService() {
             return TCPService.this;
         }
     }
-
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -128,8 +115,13 @@ public class TCPService extends Service {
     }
 
     @Override
-    public void onDestroy() {
-        Log.d("","SeERVICE destroy");
+    public void onDestroy(){
+        Log.d("dest","SeERVICE destroy");
+        try {
+            socket.close();
+        }catch(Exception e){
+            Log.d("cannot","close socekt");
+        }
         super.onDestroy();
     }
 
@@ -138,61 +130,18 @@ public class TCPService extends Service {
     PendingIntent pending;
     Intent notifIntent;
 
-    public String asd;
-    private boolean enableNotif;
-    private boolean notifSound;
-    private boolean notifVibrate;
-    private boolean sendWithEnter;
-
     @Override
     public void onCreate() {
-        //getOptions();
         startTCP();
     }
-/*
-    private void writeToFile(String data) {
-        try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(openFileOutput("config.txt", Context.MODE_PRIVATE));
-            outputStreamWriter.write(data);
-            outputStreamWriter.close();
-        }
-        catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
-        }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startID) {
+        return START_NOT_STICKY;
     }
 
-    private String readFromFile() {
-
-        String ret = "";
-
-        try {
-            InputStream inputStream = openFileInput("config.txt");
-
-            if ( inputStream != null ) {
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
-
-                while ( (receiveString = bufferedReader.readLine()) != null ) {
-                    stringBuilder.append(receiveString);
-                }
-
-                inputStream.close();
-                ret = stringBuilder.toString();
-            }
-        }
-        catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: " + e.toString());
-        } catch (IOException e) {
-            Log.e("login activity", "Can not read file: " + e.toString());
-        }
-
-        return ret;
-    }
-*/
     public void startTCP() {
-        Log.d("", "SeERVICE START");
+        Log.d("start", "SERVICE START");
         Thread t1 = new Thread() {
             public void run() {
                 while (true) {
@@ -200,7 +149,11 @@ public class TCPService extends Service {
                         String ip = "79.143.178.118";
                         int port = 6000;
                         InetSocketAddress isa = new InetSocketAddress(ip, port);
-                        socket = new Socket();
+                        if ( socket == null ) {
+                            socket = new Socket();
+                        }else{
+                            socket.close();
+                        }
                         socket.connect(isa);
                         dos = new DataOutputStream(socket.getOutputStream());
                         dis = new DataInputStream(socket.getInputStream());
@@ -224,6 +177,7 @@ public class TCPService extends Service {
         Thread t1 = new Thread() {
             public void run() {
                 String str;
+                Log.d("comm","COMMUNICATION READY");
                 while (true) {
                     try {
                         int length = dis.readInt();
@@ -480,19 +434,28 @@ public class TCPService extends Service {
                         msgQ.add(message);
                         sendMessage(16);
                     }else{
-                        insertMessage(realm, jArr.getJSONObject(0).getInt("from"), message,jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(0).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
-                        //nm = (NotificationManager) getSystemService(this.NOTIFICATION_SERVICE);
-                        //notifIntent = new Intent(this, MessagingActivity.class);
-                        //notifIntent.putExtra("id", jArr.getJSONObject(0).getInt("from"));
-                        //pending = PendingIntent.getActivity(this, 0, notifIntent, 0);
-                        //notification = new Notification.Builder(this)
-                        //        .setContentTitle("Chat")
-                        //        .setContentText(message).setSmallIcon(R.drawable.ic_launcher)
-                        //        .setContentIntent(pending)
-                        //        .setWhen(System.currentTimeMillis())
-                        //        .setAutoCancel(true)
-                        //        .build();
-                        //nm.notify(jArr.getJSONObject(0).getInt("from"), notification);
+                        insertMessage(realm, jArr.getJSONObject(0).getInt("from"), message, jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(0).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
+                        setListItems();
+                        nm = (NotificationManager) getSystemService(this.NOTIFICATION_SERVICE);
+                        notifIntent = new Intent(this, MessagingActivity.class);
+                        notifIntent.putExtra("id", jArr.getJSONObject(0).getInt("from"));
+                        pending = PendingIntent.getActivity(this, 0, notifIntent, 0);
+
+                        if( friendListActive ){
+                            int i = 0;
+                            while ( i < friendList.size() ){
+                                if ( friendList.get(i).getUserid() ==  jArr.getJSONObject(0).getInt("from") ){
+                                    friendList.get(i).setLstMsg(message);
+                                    friendList.get(i).setTime(getStringDateHHmm(jArr.getJSONObject(0).getLong("t")*1000));
+                                    refreshQ.add(new Pair<Integer, FriendListItem>(i,friendList.get(i)));
+                                    sendMessage(200);
+                                    break;
+                                }
+                                i++;
+                            }
+                        }
+                        //startNotification(realm, jArr, message);
+
                     }
                     break;
             }
@@ -509,6 +472,69 @@ public class TCPService extends Service {
             Log.d("semi :" + jsonRootObject.get("code").toString() + " ", jsonRootObject.get("error").toString());
         }
 
+    }
+
+    public void startNotification(Realm realm, JSONArray jArr, String message) throws JSONException{
+        RealmResults<Options> result = realm.where(Options.class)
+                .equalTo("key", "notification")
+                .findAll();
+        if( result.get(0).getValue().equals("1") ){
+
+            result = realm.where(Options.class)
+                    .equalTo("key", "notifsound")
+                    .findAll();
+
+            RealmResults<Options> result2 = realm.where(Options.class)
+                    .equalTo("key", "notifvibrate")
+                    .findAll();
+
+            if( result.get(0).getValue().equals("1") && result2.get(0).getValue().equals("1") ) {
+                Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                notification = new Notification.Builder(this)
+                        .setContentTitle("Chat")
+                        .setContentText(message).setSmallIcon(R.drawable.ic_launcher)
+                        .setContentIntent(pending)
+                        .setVibrate(new long[]{0, 1000, 1000, 1000, 1000})
+                        .setSound(alarmSound)
+                        .setWhen(System.currentTimeMillis())
+                        .setAutoCancel(true)
+                        .build();
+                nm.notify(jArr.getJSONObject(0).getInt("from"), notification);
+            } else{
+                if ( result.get(0).getValue().equals("1") ){
+                    Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    notification = new Notification.Builder(this)
+                            .setContentTitle("Chat")
+                            .setContentText(message).setSmallIcon(R.drawable.ic_launcher)
+                            .setContentIntent(pending)
+                            .setSound(alarmSound)
+                            .setWhen(System.currentTimeMillis())
+                            .setAutoCancel(true)
+                            .build();
+                    nm.notify(jArr.getJSONObject(0).getInt("from"), notification);
+                }else if( result2.get(0).getValue().equals("1" )){
+                    notification = new Notification.Builder(this)
+                            .setContentTitle("Chat")
+                            .setContentText(message).setSmallIcon(R.drawable.ic_launcher)
+                            .setContentIntent(pending)
+                            .setVibrate(new long[]{0, 1000, 1000, 1000, 1000})
+                            .setWhen(System.currentTimeMillis())
+                            .setAutoCancel(true)
+                            .build();
+                    nm.notify(jArr.getJSONObject(0).getInt("from"), notification);
+                }else{
+                    notification = new Notification.Builder(this)
+                            .setContentTitle("Chat")
+                            .setContentText(message).setSmallIcon(R.drawable.ic_launcher)
+                            .setContentIntent(pending)
+                            .setWhen(System.currentTimeMillis())
+                            .setAutoCancel(true)
+                            .build();
+                    nm.notify(jArr.getJSONObject(0).getInt("from"), notification);
+                }
+
+            }
+        }
     }
 
     public void insertMessage(Realm realm, int fromid, String msg, int msgid, double t, int toid) {
@@ -549,9 +575,7 @@ public class TCPService extends Service {
 
     public void logOut() {
         try {
-            byebye = true;
             requestedyet = false;
-            timeS = 0;
             logedIn = false;
             socket.close();
             socket = null;
@@ -562,6 +586,7 @@ public class TCPService extends Service {
 
     private void setListItems(){
         Realm realm  = Realm.getInstance(this);
+        int i = 0;
         for (FriendListItem fli : friendList){
             RealmResults<DBMessage> result = realm.where(DBMessage.class)
                     .beginGroup()
@@ -581,19 +606,25 @@ public class TCPService extends Service {
                if( dbm.getMsgid() == max ){
 
 
-                   long asd = ((long)Math.floor(dbm.getT() + 0.5d))*1000 ;
-                   Date date = new Date(asd);
-                   DateFormat formatter = new SimpleDateFormat("HH:mm");
-                   String dateFormatted = formatter.format(date);
+                   long asd = ((long)Math.floor(dbm.getT() + 0.5d))*1000;
+
 
                    fli.setLstMsg(dbm.getMsg());
-                   fli.setTime(dateFormatted);
-                   Log.d("time","" + dateFormatted);
+                   fli.setTime(getStringDateHHmm(asd));
+
+                   //Log.d("time","" + dateFormatted);
                    break;
                }
             }
-
+            i++;
         }
+    }
+
+    private String getStringDateHHmm( long asd ){
+        Date date = new Date(asd);
+        DateFormat formatter = new SimpleDateFormat("HH:mm");
+        String dateFormatted = formatter.format(date);
+        return dateFormatted;
     }
 
     public void requestListHandler(JSONArray jsonArray) {
@@ -844,7 +875,6 @@ public class TCPService extends Service {
         }
     }
 
-
     public void declineRequest(String userName) {
         int userid = -1;
 
@@ -904,7 +934,6 @@ public class TCPService extends Service {
             Log.d("hiba", "deleteFriend küldési hiba ");
         }
     }
-
 
     public void sendMessage(int state) {
         Log.d("kuldok", "uzenetet");
@@ -1069,7 +1098,6 @@ public class TCPService extends Service {
     }
 
     public void send(String message) {
-        //{"type":13, "userid":17,"msg":"Szia! Ez egy tesztüzenet."}
         try {
             String enc = encrypt(message);
             String text = enc.replace("\n", "").replace("\r", "");
@@ -1097,78 +1125,15 @@ public class TCPService extends Service {
         return msgQ;
     }
 
-    private void getOptions(){
-        Realm realm = Realm.getInstance(this);
-        RealmResults<Options> result = realm.where(Options.class)
-                .equalTo("key", "notification")
-                .findAll();
+    public Queue<Pair<Integer, FriendListItem>> getRefreshQ() {
+        return refreshQ;
+    }
 
-        if ( result.size() == 0 ){
-            realm.beginTransaction();
-            Options option = realm.createObject(Options.class);
-            option.setKey("notification");
-            option.setValue("1");
-            realm.commitTransaction();
-        }else{
-            if ( result.get(0).getValue() == "0" ) {
-                enableNotif = false;
-            }else{
-                enableNotif = true;
-            }
-        }
+    public boolean isFriendListActive() {
+        return friendListActive;
+    }
 
-        result = realm.where(Options.class)
-                .equalTo("key", "notifsound")
-                .findAll();
-
-        if ( result.size() == 0 ){
-            realm.beginTransaction();
-            Options option = realm.createObject(Options.class);
-            option.setKey("notifsound");
-            option.setValue("1");
-            realm.commitTransaction();
-        }else{
-            if ( result.get(0).getValue() == "0" ) {
-                notifSound = false;
-            }else{
-                notifSound = true;
-            }
-        }
-
-        result = realm.where(Options.class)
-                .equalTo("key", "notifvibrate")
-                .findAll();
-
-        if ( result.size() == 0 ){
-            realm.beginTransaction();
-            Options option = realm.createObject(Options.class);
-            option.setKey("notifvibrate");
-            option.setValue("1");
-            realm.commitTransaction();
-        }else{
-            if ( result.get(0).getValue() == "0" ) {
-                notifVibrate = false;
-            }else{
-                notifVibrate = true;
-            }
-        }
-
-        result = realm.where(Options.class)
-                .equalTo("key", "sendwithenter")
-                .findAll();
-
-        if ( result.size() == 0 ){
-            realm.beginTransaction();
-            Options option = realm.createObject(Options.class);
-            option.setKey("sendwithenter");
-            option.setValue("1");
-            realm.commitTransaction();
-        }else{
-            if ( result.get(0).getValue() == "0" ) {
-                sendWithEnter = false;
-            }else{
-                sendWithEnter = true;
-            }
-        }
+    public void setFriendListActive(boolean friendListActive) {
+        this.friendListActive = friendListActive;
     }
 }

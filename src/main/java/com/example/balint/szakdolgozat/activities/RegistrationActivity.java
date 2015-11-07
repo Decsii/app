@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.example.balint.szakdolgozat.R;
-import com.example.balint.szakdolgozat.javaclasses.TCPService;
 
 
 public class RegistrationActivity extends ActionBarActivity {
