@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.example.balint.szakdolgozat.javaclasses.RoundedImageView
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:src="@drawable/balazs"
+        android:id="@+id/imgView" />
+
+    <TextView
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="3dp"
+        android:textSize="25sp"
+        android:gravity="center_vertical"
+        android:textColor="#990000"
+        android:id="@+id/nameText" />
+
+    <Button
+        android:layout_width="125dp"
+        android:layout_height="40dp"
+        android:background="@drawable/button_login"
+        android:textSize="17sp"
+        android:textColor="#fff"
+        android:text="Viszzavonás"
+        android:id="@+id/rundoB" />
+
+</LinearLayout>

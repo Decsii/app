@@ -14,15 +14,17 @@ public class FriendListItem {
     private int userid;
     private long last_login;
     private boolean loggedin;
-    private final int type = 0;
+    //0 friend, 1 request, 2 outgoing;
+    private int type = 0;
 
-    public FriendListItem(int userid, String name, String lstMsg, String time, boolean loggedin, long last_login) {
+    public FriendListItem(int userid, String name, String lstMsg, String time, boolean loggedin, long last_login, int type) {
         this.name = name;
         this.lstMsg = lstMsg;
         this.time = time;
         this.userid = userid;
         this.loggedin = loggedin;
         this.last_login = last_login;
+        this.type = type;
     }
 
     public long getLast_login() {
@@ -76,4 +78,7 @@ public class FriendListItem {
     public int getType() {
         return type;
     }
+
+
+
 }

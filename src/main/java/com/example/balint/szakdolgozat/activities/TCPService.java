@@ -65,13 +65,14 @@ public class TCPService extends Service {
 
     private List<FriendListItem> friendList = new ArrayList<>();
     private List<FriendListItem> friendRequests = new ArrayList<>();
+    private List<FriendListItem> sendedRequests = new ArrayList<>();
 
     private Messenger messageHandler;
     private boolean sendAF = false;
 
     private boolean sendedR = false;
     private int numOfSended = 0;
-    private List<Friend> sendedRequests = new ArrayList<>();
+
 
     public List<Pair<String, Integer>> messagesList = new ArrayList<>();
 
@@ -149,11 +150,7 @@ public class TCPService extends Service {
                         String ip = "79.143.178.118";
                         int port = 6000;
                         InetSocketAddress isa = new InetSocketAddress(ip, port);
-                        if ( socket == null ) {
-                            socket = new Socket();
-                        }else{
-                            socket.close();
-                        }
+                        socket = new Socket();
                         socket.connect(isa);
                         dos = new DataOutputStream(socket.getOutputStream());
                         dis = new DataInputStream(socket.getInputStream());
@@ -161,7 +158,7 @@ public class TCPService extends Service {
                         break;
                     } catch (Exception e) {
                         try {
-                            Thread.sleep(2000);
+                            Thread.sleep(3000);
                             Log.d("", "újracsatlakozás");
                         } catch (InterruptedException ex) {
                             Log.d("", "váratlan hiba");
@@ -289,7 +286,7 @@ public class TCPService extends Service {
                     sendMessage(6);
                     break;
                 case "7":
-                    sendedRequests.add(new Friend(addFId, addFName));
+                    sendedRequests.add( new FriendListItem(addFId,addFName,"","",false,0,2));
                     sendMessage(7);
                     break;
                 case "8":
@@ -457,6 +454,27 @@ public class TCPService extends Service {
                         //startNotification(realm, jArr, message);
 
                     }
+                    break;
+                case "21" :
+                    jObj = jsonRootObject.optJSONObject("userdata ");
+                    friendRequests.add(new FriendListItem(jObj.getInt("userid"),jObj.getString("username"),"","",jObj.getInt("isloggedin") == 0 ? false : true,0,1));
+                    if( friendListActive ) {
+                        sendMessage(300);
+                    }
+                    break;
+                case "22":
+                    jObj = jsonRootObject.optJSONObject("userdata ");
+                    int ind = 0;
+                    for ( int i = 0; i < sendedRequests.size(); i++ ){
+                        if ( sendedRequests.get(i).getUserid() ==  jObj.getInt("userid") ){
+                            ind = i;
+                            break;
+                        }
+                    }
+                    sendedRequests.remove(ind);
+                    friendList.add(new FriendListItem( jObj.getInt("userid"), jObj.getString("username"),"","",jObj.getInt("isloggedin") == 0 ? false : true  ,0,0));
+                    if( friendListActive ) {
+                        sendMessage(301);}
                     break;
             }
         } else {
@@ -637,7 +655,7 @@ public class TCPService extends Service {
             requestS = true;
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject friendObject = jsonArray.getJSONObject(i);
-                friendRequests.add(new FriendListItem(friendObject.getInt("requestor"),"","","",false,0));
+                friendRequests.add(new FriendListItem(friendObject.getInt("requestor"),"","","",false,0,1));
             }
 
             userInfoByID(friendRequests.get(numOfRequests).getUserid());
@@ -656,7 +674,8 @@ public class TCPService extends Service {
             sendedR = true;
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject friendObject = jsonArray.getJSONObject(i);
-                sendedRequests.add(new Friend(friendObject.getInt("requested")));
+                //sendedRequests.add(new Friend(friendObject.getInt("requested")));
+                sendedRequests.add(new FriendListItem(friendObject.getInt("requested"),"","","",false,0,2));
             }
 
             userInfoByID(sendedRequests.get(numOfSended).getUserid());
@@ -677,10 +696,10 @@ public class TCPService extends Service {
                 JSONObject friendObject = jsonArray.getJSONObject(i);
                 if (friendObject.getInt("user1") == myId) {
                     //friendList.add(new Friend(friendObject.getInt("user2")));
-                    friendList.add(new FriendListItem(friendObject.getInt("user2"),"","","",false,0));
+                    friendList.add(new FriendListItem(friendObject.getInt("user2"),"","","",false,0,0));
                 } else {
                     //friendList.add(new Friend(friendObject.getInt("user1")));
-                    friendList.add(new FriendListItem(friendObject.getInt("user1"),"","","",false,0));
+                    friendList.add(new FriendListItem(friendObject.getInt("user1"),"","","",false,0,0));
                 }
             }
             friendS = true;
@@ -964,7 +983,7 @@ public class TCPService extends Service {
 
     public List<String> getSendedString() {
         List str = new ArrayList<>();
-        for (Friend s : sendedRequests) {
+        for (FriendListItem s : sendedRequests) {
             str.add(s.getName());
         }
         return str;
@@ -1136,4 +1155,17 @@ public class TCPService extends Service {
     public void setFriendListActive(boolean friendListActive) {
         this.friendListActive = friendListActive;
     }
+
+    public List<FriendListItem> getFriendRequests() {
+        return friendRequests;
+    }
+
+    public List<FriendListItem> getSendedRequests() {
+        return sendedRequests;
+    }
+
+    public void logMe(String str){
+        Log.d("logthis",str);
+    }
+
 }

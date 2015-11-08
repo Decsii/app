@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.example.balint.szakdolgozat.javaclasses.FriendListAdapter;
 import com.example.balint.szakdolgozat.javaclasses.FriendListItem;
 import com.example.balint.szakdolgozat.R;
+import com.example.balint.szakdolgozat.javaclasses.RequestListAdapter;
 
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class FriendListActivity extends ActionBarActivity {
     private Handler messageHandler = new MessageHandler();
     private String[] menuItems;
     private FriendListAdapter fla;
+    private RequestListAdapter rla;
 
     public class MessageHandler extends Handler {
         @Override
@@ -70,7 +72,7 @@ public class FriendListActivity extends ActionBarActivity {
                 case 5:
                     toast = Toast.makeText(FriendListActivity.this, "Felkérés visszavonva", Toast.LENGTH_SHORT);
                     toast.show();
-                    writeSended();
+                    writeRequests();
                     break;
                 case 6:
                     toast = Toast.makeText(FriendListActivity.this, "Felkérés visszautasitva", Toast.LENGTH_SHORT);
@@ -78,9 +80,9 @@ public class FriendListActivity extends ActionBarActivity {
                     writeRequests();
                     break;
                 case 7:
-                    toast = Toast.makeText(FriendListActivity.this, "Barát hozzáadva", Toast.LENGTH_SHORT);
+                    toast = Toast.makeText(FriendListActivity.this, "Barát felkérés elküldve", Toast.LENGTH_SHORT);
                     toast.show();
-                    writeSended();
+                    writeRequests();
                     break;
                 case 16:
                     writeFriendList();
@@ -90,6 +92,22 @@ public class FriendListActivity extends ActionBarActivity {
                     break;
                 case 200:
                     refreshFriendItem();
+                    break;
+                case 300:
+                    toast = Toast.makeText(FriendListActivity.this, "Új barát felkrés érkezett", Toast.LENGTH_SHORT);
+                    toast.show();
+                    if (currentView == 1){
+                        writeRequests();
+                    }
+                    break;
+                case 301:
+                    toast = Toast.makeText(FriendListActivity.this, "Barát felkérésedet elfogadták", Toast.LENGTH_SHORT);
+                    toast.show();
+                    if (currentView == 1){
+                        writeRequests();
+                    }else if( currentView == 0 ){
+                        writeFriendList();
+                    }
                     break;
                 case 900:
                     intent = new Intent(FriendListActivity.this, MessagingActivity.class);
@@ -158,8 +176,6 @@ public class FriendListActivity extends ActionBarActivity {
         Button btn5 = (Button) findViewById(R.id.profileB);
         btn5.setOnClickListener(profileA);
 
-        //Button btn4 = (Button) findViewById(R.id.writeSended);
-        //btn4.setOnClickListener(writeSendedB);
     }
 
     @Override
@@ -275,12 +291,6 @@ public class FriendListActivity extends ActionBarActivity {
         }
     };
 
-    private View.OnClickListener writeSendedB = new View.OnClickListener() {
-        public void onClick(View v) {
-            writeSended();
-        }
-    };
-
     private void writeFriendList() {
         currentView = 0;
         friendList = tcps.getFriendsString();
@@ -307,6 +317,22 @@ public class FriendListActivity extends ActionBarActivity {
     private void writeRequests() {
         currentView = 1;
         requestList = tcps.getRequestsString();
+
+        usersListView.setAdapter(rla);
+        rla.clearList();
+
+        rla.addFriend(new FriendListItem(-1, "", "", "", false, 0, 3));
+        for (FriendListItem s : tcps.getFriendRequests()) {
+            rla.addFriend(s);
+        }
+
+        rla.addFriend(new FriendListItem(-1,"","","",false,0,4));
+        for (FriendListItem s : tcps.getSendedRequests()) {
+            rla.addFriend(s);
+        }
+
+
+        /*
         namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.user_list_item, requestList);
         usersListView.setAdapter(namesArrayAdapter);
 
@@ -316,12 +342,12 @@ public class FriendListActivity extends ActionBarActivity {
                 tcps.acceptRequest(requestList.get(i));
                 Log.d(requestList.get(i), "" + i);
             }
-        });
+        });*/
 
         registerForContextMenu(usersListView);
 
     }
-
+/*
     private void writeSended() {
         currentView = 2;
         sendedList = tcps.getSendedString();
@@ -337,12 +363,8 @@ public class FriendListActivity extends ActionBarActivity {
         });
 
         registerForContextMenu(usersListView);
-    }
+    }*/
 
-    private boolean listIsAtTop()   {
-        if(usersListView.getChildCount() == 0) return true;
-        return usersListView.getChildAt(0).getTop() == 0;
-    }
 
     private void refreshFriendItem(){
         fla.refreshFriend(tcps.getRefreshQ().poll());
@@ -353,6 +375,7 @@ public class FriendListActivity extends ActionBarActivity {
         Intent intent = new Intent(FriendListActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
+        rla = new RequestListAdapter(this,tcps);
         tcps.setCurrentPartner(-1);
         tcps.setFriendListActive(true);
         Log.d("", "FRIEND REQUEST");
