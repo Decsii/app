@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import com.example.balint.szakdolgozat.javaclasses.DBMessage;
 import com.example.balint.szakdolgozat.R;
+import com.example.balint.szakdolgozat.javaclasses.Options;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -187,10 +189,21 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = new Intent(MainActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
-        proba();
-    }
 
-    public void proba() {
+        if ( tcps.isLogedIn() ){
+            intent = new Intent(MainActivity.this, FriendListActivity.class);
+            String uz = "nomsg";
+            intent.putExtra(EXTRA_MESSAGE, uz);
+            startActivity(intent);
+        }
+
+        Realm realm = Realm.getInstance(this);
+        RealmResults<Options> result = realm.where(Options.class)
+                .equalTo("key", "sid")
+                .findAll();
+        if( result.size() == 1 ){
+            tcps.sendSID(result.get(0).getValue());
+        }
 
     }
 

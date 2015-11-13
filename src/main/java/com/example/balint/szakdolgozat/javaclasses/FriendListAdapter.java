@@ -89,11 +89,13 @@ public class FriendListAdapter extends BaseAdapter {
         }
 
         //String name = fli.get(i).getName();
-
         TextView txtMessage = (TextView) convertView.findViewById(R.id.nameText);
         txtMessage.setText( fli.get(i).getName() );
+
         if( fli.get(i).isLoggedin() ) {
             txtMessage.setTypeface(null, Typeface.BOLD);
+        }else{
+            txtMessage.setTypeface(null, Typeface.NORMAL);
         }
         TextView txtMessage2 = (TextView) convertView.findViewById(R.id.lastMsgText);
         if ( fli.get(i).getLstMsg() == "" ){
