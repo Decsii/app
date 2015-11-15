@@ -50,58 +50,41 @@ import io.realm.RealmResults;
  * Created by Balint on 2015.08.20..
  */
 public class TCPService extends Service {
-
     // Binder given to clients
     private final IBinder mBinder = new LocalBinder();
-    public final static String EXTRA_MESSAGE = "com.example.balint.szakdolgozat.MESSAGE";
-
     public Socket socket = null;
     private DataOutputStream dos;
     private DataInputStream dis;
-
     private boolean logedIn = false;
-    public int myId;
-
+    private int myId;
+    private String myName;
     private List<FriendListItem> friendList = new ArrayList<>();
     private List<FriendListItem> friendRequests = new ArrayList<>();
     private List<FriendListItem> sendedRequests = new ArrayList<>();
-
+    private List<Pair<Integer,String>> tenMoreMessage = new ArrayList<>();
     private Messenger messageHandler;
     private boolean sendAF = false;
-
     private boolean sendedR = false;
     private int numOfSended = 0;
-
-
     public List<Pair<String, Integer>> messagesList = new ArrayList<>();
-
     boolean friendS = false;
-    int numOfFriends = 0;
-
-    boolean requestS = false;
-    int numOfRequests = 0;
-
-    public int currentPartner;
-
+    private int numOfFriends = 0;
+    private boolean requestS = false;
+    private int numOfRequests = 0;
+    private int currentPartner;
     private String currentPartnerName;
     private String lastActive;
-
-
     private int addFId;
     private String addFName;
-
     private int messagesArrived;
-
-    public boolean requestedyet = false;
-
+    private boolean requestedyet = false;
     private List<Integer> leftList = new ArrayList<>();
-
     private Queue<String> msgQ = new LinkedList<>();
     private Queue<Pair<Integer, FriendListItem>> refreshQ = new LinkedList<>();
-
     private boolean friendListActive = false;
     private boolean refresh = false;
-
+    private int currentFirstMsgid;
+    private int messagesNum;
 
     public class LocalBinder extends Binder {
         public TCPService getService() {
@@ -277,6 +260,7 @@ public class TCPService extends Service {
                 case "0":
                     JSONObject jo3 = jsonRootObject.optJSONObject("userdata");
                     myId = jo3.getInt("id");
+                    myName = jo3.getString("username");
                     logedIn = true;
                     faszkivan(jsonRootObject.getString("sid"));
                     sendMessage(0);
@@ -286,6 +270,7 @@ public class TCPService extends Service {
                     logedIn = true;
                     JSONObject jo4 = jsonRootObject.optJSONObject("userdata");
                     myId = jo4.getInt("id");
+                    myName = jo4.getString("username");
                     faszkivan(jsonRootObject.getString("sid"));
                     logInHandler();
                     Log.d("tipus : ", "bejelentkezesi kerelem");
@@ -467,6 +452,21 @@ public class TCPService extends Service {
                         Log.d("", Log.getStackTraceString(e));
                     }
                     break;
+                case "11":
+                    tenMoreMessage.clear();
+                    jArr = jsonRootObject.optJSONArray("messages");
+                    if ( jArr.length() == 0 ) return;
+                    currentFirstMsgid = jArr.getJSONObject(0).getInt("msgid");
+                    for ( int i = 0; i < jArr.length(); i++ ){
+                        JSONObject jo = jArr.getJSONObject(i);
+                        try {
+                            tenMoreMessage.add(new Pair<Integer, String>(jo.getInt("from"),decrypt(jo.getString("msg"))));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    sendMessage(11);
+                    break;
                 case "13":
                     try {
                         Realm realm = Realm.getInstance(this);
@@ -497,6 +497,7 @@ public class TCPService extends Service {
                 case "18":
                     jObj = jsonRootObject.optJSONObject("userdata");
                     myId = jObj.getInt("id");
+                    myName = jObj.getString("username");
                     logedIn = true;
                     sendMessage(1);
                     break;
@@ -770,7 +771,6 @@ public class TCPService extends Service {
             sendedR = true;
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject friendObject = jsonArray.getJSONObject(i);
-                //sendedRequests.add(new Friend(friendObject.getInt("requested")));
                 sendedRequests.add(new FriendListItem(friendObject.getInt("requested"), "", "", "", false, 0, 2));
             }
 
@@ -791,10 +791,8 @@ public class TCPService extends Service {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject friendObject = jsonArray.getJSONObject(i);
                 if (friendObject.getInt("user1") == myId) {
-                    //friendList.add(new Friend(friendObject.getInt("user2")));
                     friendList.add(new FriendListItem(friendObject.getInt("user2"), "", "", "", false, 0, 0));
                 } else {
-                    //friendList.add(new Friend(friendObject.getInt("user1")));
                     friendList.add(new FriendListItem(friendObject.getInt("user1"), "", "", "", false, 0, 0));
                 }
             }
@@ -1277,5 +1275,33 @@ public class TCPService extends Service {
 
     public boolean isLogedIn() {
         return logedIn;
+    }
+
+    public String getMyName() {
+        return myName;
+    }
+
+    public int getMyId() {
+        return myId;
+    }
+
+    public List<Pair<Integer, String>> getTenMoreMessage() {
+        return tenMoreMessage;
+    }
+
+    public int getCurrentFirstMsgid() {
+        return currentFirstMsgid;
+    }
+
+    public void setCurrentFirstMsgid(int currentFirstMsgid) {
+        this.currentFirstMsgid = currentFirstMsgid;
+    }
+
+    public int getCurrentPartner() {
+        return currentPartner;
+    }
+
+    public boolean isRequestedyet() {
+        return requestedyet;
     }
 }

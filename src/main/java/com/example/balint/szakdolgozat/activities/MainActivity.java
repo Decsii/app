@@ -16,55 +16,32 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.example.balint.szakdolgozat.javaclasses.DBMessage;
 import com.example.balint.szakdolgozat.R;
 import com.example.balint.szakdolgozat.javaclasses.Options;
-
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-
+/**
+ * @author      Decsi Bálint
+ * @version     1.0
+ */
 public class MainActivity extends ActionBarActivity {
-
-    public final static String EXTRA_MESSAGE = "com.example.balint.szakdolgozat.MESSAGE";
+    /**
+     * Service
+     */
     private TCPService tcps;
+    /**
+     * Az activity hozzá van-e kötve a servicehez.
+     */
     private boolean mBound = false;
+    /**
+     * A service és az activity közötti kommunikáció.
+     */
     private Handler messageHandler = new MessageHandler();
 
-
-    public class MessageHandler extends Handler {
-        @Override
-        public void handleMessage(android.os.Message message) {
-            int state = message.arg1;
-            Intent intent;
-            Toast toast;
-            String uz;
-            switch (state) {
-                case 0:
-                    intent = new Intent(MainActivity.this, FriendListActivity.class);
-                    uz = "nomsg";
-                    intent.putExtra(EXTRA_MESSAGE, uz);
-                    startActivity(intent);
-                    break;
-                case 1:
-                    intent = new Intent(MainActivity.this, FriendListActivity.class);
-                    uz = "nomsg";
-                    intent.putExtra(EXTRA_MESSAGE, uz);
-                    startActivity(intent);
-                    break;
-                case 1121:
-                    toast = Toast.makeText(MainActivity.this, "Hibás felhasználónév/jelszó", Toast.LENGTH_SHORT);
-                    toast.show();
-                    break;
-                case 112:
-                    toast = Toast.makeText(MainActivity.this, "Már be vagy jelentkezve", Toast.LENGTH_SHORT);
-                    toast.show();
-                    break;
-            }
-        }
-    }
-
+    /**
+     * Az activity csatlakozása a servicehez.
+     */
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -81,43 +58,51 @@ public class MainActivity extends ActionBarActivity {
         }
     };
 
+    /**
+     * A service és az activity közötti kommunikációért felelős osztály.
+     */
+    public class MessageHandler extends Handler {
+        @Override
+        public void handleMessage(android.os.Message message) {
+            int state = message.arg1;
+            Intent intent;
+            Toast toast;
+            switch (state) {
+                case 0:
+                    intent = new Intent(MainActivity.this, FriendListActivity.class);
+                    startActivity(intent);
+                    break;
+                case 1:
+                    intent = new Intent(MainActivity.this, FriendListActivity.class);
+                    startActivity(intent);
+                    break;
+                case 1121:
+                    toast = Toast.makeText(MainActivity.this, "Hibás felhasználónév/jelszó", Toast.LENGTH_SHORT);
+                    toast.show();
+                    break;
+                case 112:
+                    toast = Toast.makeText(MainActivity.this, "Már be vagy jelentkezve", Toast.LENGTH_SHORT);
+                    toast.show();
+                    break;
+            }
+        }
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
+        //Csazlakozunk a servicehez.
         Intent intent = new Intent(this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
 
         startService(intent);
         this.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-
-        Realm realm = Realm.getInstance(this);
-        RealmResults<DBMessage> result = realm.where(DBMessage.class)
-                .findAll();
-        //RealmResults<DBMessage> result = realm.where(DBMessage.class)
-        //        .beginGroup()
-        //        .equalTo("fromid", 26)
-        //        .equalTo("toid", 28)
-        //        .endGroup()
-        //        .or()
-        //        .beginGroup()
-        //        .equalTo("fromid", 28)
-        //        .equalTo("toid", 26)
-        //        .endGroup()
-        //        .findAll();
-        //Log.d("result", result.toString());
-        //realm.beginTransaction();
-        //result.clear();
-        //realm.commitTransaction();
-        //RealmResults<Messages> result2 = realm.where(Messages.class)
-        //        .findAll();
-        //int asdf = result2.max("msgid").intValue();
-        //Log.d("resultMAX","" + asdf );
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        // Unbind from the service
+        // Lecsatlakozunk a serviceről.
         if (mBound) {
             unbindService(mConnection);
             mBound = false;
@@ -136,12 +121,18 @@ public class MainActivity extends ActionBarActivity {
         btn2.setOnClickListener(regA);
     }
 
+    /**
+     * Bejelentkezés gomb listener.
+     */
     private View.OnClickListener signInA = new View.OnClickListener() {
         public void onClick(View v) {
             logIn();
         }
     };
 
+    /**
+     * Regisztrálás gomb listener.
+     */
     private View.OnClickListener regA = new View.OnClickListener() {
         public void onClick(View v) {
             toRegistration();
@@ -150,26 +141,21 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Bejelentkezés
+     */
     public void logIn() {
         EditText userName = (EditText) findViewById(R.id.usernameText);
         EditText pass = (EditText) findViewById(R.id.passwordText);
@@ -178,13 +164,17 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    /**
+     * Regisztráció
+     */
     public void toRegistration() {
         Intent intent = new Intent(this, RegistrationActivity.class);
-        String message = "nomsg";
-        intent.putExtra(EXTRA_MESSAGE, message);
         startActivity(intent);
     }
 
+    /**
+     * Ha csatlakoztunk a servicehez, akkor fut le.
+     */
     private void onServiceReady() {
         Intent intent = new Intent(MainActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
@@ -192,19 +182,16 @@ public class MainActivity extends ActionBarActivity {
 
         if ( tcps.isLogedIn() ){
             intent = new Intent(MainActivity.this, FriendListActivity.class);
-            String uz = "nomsg";
-            intent.putExtra(EXTRA_MESSAGE, uz);
             startActivity(intent);
+        }else {
+            Realm realm = Realm.getInstance(this);
+            RealmResults<Options> result = realm.where(Options.class)
+                    .equalTo("key", "sid")
+                    .findAll();
+            if( result.size() == 1 ){
+                tcps.sendSID(result.get(0).getValue());
+            }
         }
-
-        Realm realm = Realm.getInstance(this);
-        RealmResults<Options> result = realm.where(Options.class)
-                .equalTo("key", "sid")
-                .findAll();
-        if( result.size() == 1 ){
-            tcps.sendSID(result.get(0).getValue());
-        }
-
     }
 
 }

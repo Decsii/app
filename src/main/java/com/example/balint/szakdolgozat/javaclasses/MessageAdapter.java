@@ -43,6 +43,11 @@ public class MessageAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public void addMessageFirst(Spannable message, int direction) {
+        messages.add(0,new Pair(message, direction));
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getCount() {
         return messages.size();

@@ -12,8 +12,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.balint.szakdolgozat.R;
@@ -23,9 +26,17 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 
 public class ProfileActivity extends ActionBarActivity {
-
+    /**
+     * Service
+     */
     private TCPService tcps;
+    /**
+     * Az activity hozzá van-e kötve a servicehez.
+     */
     private boolean mBound = false;
+    /**
+     * A service és az activity közötti kommunikáció.
+     */
     private Handler messageHandler = new MessageHandler();
 
     @Override
@@ -34,86 +45,9 @@ public class ProfileActivity extends ActionBarActivity {
         setContentView(R.layout.activity_profile);
 
     }
-
-    private void swtichInit(){
-        Switch s1 = (Switch) findViewById(R.id.notifS);
-        s1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Realm realm = Realm.getInstance(ProfileActivity.this);
-                RealmResults<Options> result = realm.where(Options.class)
-                        .equalTo("key", "notification")
-                        .findAll();
-                if(isChecked){
-                    realm.beginTransaction();
-                    result.get(0).setValue("1");
-                    realm.commitTransaction();
-                }else{
-                    realm.beginTransaction();
-                    result.get(0).setValue("0");
-                    realm.commitTransaction();
-                }
-            }
-        });
-
-        Switch s2 = (Switch) findViewById(R.id.soundS);
-        s2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Realm realm = Realm.getInstance(ProfileActivity.this);
-                RealmResults<Options> result = realm.where(Options.class)
-                        .equalTo("key", "notifsound")
-                        .findAll();
-                if(isChecked){
-                    realm.beginTransaction();
-                    result.get(0).setValue("1");
-                    realm.commitTransaction();
-                }else{
-                    realm.beginTransaction();
-                    result.get(0).setValue("0");
-                    realm.commitTransaction();
-                }
-            }
-        });
-
-        Switch s3 = (Switch) findViewById(R.id.vibrateS);
-        s3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Realm realm = Realm.getInstance(ProfileActivity.this);
-                RealmResults<Options> result = realm.where(Options.class)
-                        .equalTo("key", "notifvibrate")
-                        .findAll();
-                if(isChecked){
-                    realm.beginTransaction();
-                    result.get(0).setValue("1");
-                    realm.commitTransaction();
-                }else{
-                    realm.beginTransaction();
-                    result.get(0).setValue("0");
-                    realm.commitTransaction();
-                }
-            }
-        });
-
-        Switch s4 = (Switch) findViewById(R.id.sendS);
-        s4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Realm realm = Realm.getInstance(ProfileActivity.this);
-                RealmResults<Options> result = realm.where(Options.class)
-                        .equalTo("key", "sendwithenter")
-                        .findAll();
-                if(isChecked){
-                    realm.beginTransaction();
-                    result.get(0).setValue("1");
-                    realm.commitTransaction();
-                }else{
-                    realm.beginTransaction();
-                    result.get(0).setValue("0");
-                    realm.commitTransaction();
-                }
-            }
-        });
-
-    }
-
+    /**
+     * A service és az activity közötti kommunikációért felelős osztály.
+     */
     public class MessageHandler extends Handler {
         @Override
         public void handleMessage(android.os.Message message) {
@@ -127,7 +61,9 @@ public class ProfileActivity extends ActionBarActivity {
             }
         }
     }
-
+    /**
+     * Az activity csatlakozása a servicehez.
+     */
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -152,7 +88,35 @@ public class ProfileActivity extends ActionBarActivity {
 
         startService(intent);
         this.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
+        TextView b1 = (TextView) findViewById(R.id.Logout);
+        b1.setOnClickListener(logoutAction);
+
+        TextView b2 = (TextView) findViewById(R.id.removeMyself);
+        b2.setOnClickListener(removeMyselfAct);
+
     }
+
+    /**
+     * Kijelentkezés listener.
+     */
+    private View.OnClickListener logoutAction = new View.OnClickListener() {
+        public void onClick(View v) {
+            Log.d("ASD","ADS");
+            tcps.logOut();
+            startActivity(new Intent(ProfileActivity.this, MainActivity.class));
+        }
+    };
+
+    /**
+     * Regisztráció törlése listener.
+     */
+    private View.OnClickListener removeMyselfAct = new View.OnClickListener() {
+        public void onClick(View v) {
+            tcps.removeMyself();
+            startActivity(new Intent(ProfileActivity.this, MainActivity.class));
+        }
+    };
 
     @Override
     protected void onStop() {
@@ -186,11 +150,31 @@ public class ProfileActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Ha csatlakoztunk a servicehez, akkor fut le.
+     */
     private void onServiceReady(){
         Intent intent = new Intent(ProfileActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
 
+        if(!tcps.isLogedIn()){
+            intent = new Intent(ProfileActivity.this, MainActivity.class);
+            startActivity(intent);
+            return;
+        }
+
+        setSwitches();
+        swtichInit();
+
+        TextView name = (TextView) findViewById(R.id.profileName);
+        name.setText(tcps.getMyName());
+    }
+
+    /**
+     * Kapcsolók beállitása.
+     */
+    private void setSwitches(){
         Switch s1 = (Switch) findViewById(R.id.notifS);
         Switch s2 = (Switch) findViewById(R.id.soundS);
         Switch s3 = (Switch) findViewById(R.id.vibrateS);
@@ -273,6 +257,88 @@ public class ProfileActivity extends ActionBarActivity {
             option.setValue("1");
             realm.commitTransaction();
         }
-        swtichInit();
     }
+
+    /**
+     * Listenerek hozzáadása a kapcsolókhoz.
+     */
+    private void swtichInit(){
+        Switch s1 = (Switch) findViewById(R.id.notifS);
+        s1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Realm realm = Realm.getInstance(ProfileActivity.this);
+                RealmResults<Options> result = realm.where(Options.class)
+                        .equalTo("key", "notification")
+                        .findAll();
+                if (isChecked) {
+                    realm.beginTransaction();
+                    result.get(0).setValue("1");
+                    realm.commitTransaction();
+                } else {
+                    realm.beginTransaction();
+                    result.get(0).setValue("0");
+                    realm.commitTransaction();
+                }
+            }
+        });
+
+        Switch s2 = (Switch) findViewById(R.id.soundS);
+        s2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Realm realm = Realm.getInstance(ProfileActivity.this);
+                RealmResults<Options> result = realm.where(Options.class)
+                        .equalTo("key", "notifsound")
+                        .findAll();
+                if(isChecked){
+                    realm.beginTransaction();
+                    result.get(0).setValue("1");
+                    realm.commitTransaction();
+                }else{
+                    realm.beginTransaction();
+                    result.get(0).setValue("0");
+                    realm.commitTransaction();
+                }
+            }
+        });
+
+        Switch s3 = (Switch) findViewById(R.id.vibrateS);
+        s3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Realm realm = Realm.getInstance(ProfileActivity.this);
+                RealmResults<Options> result = realm.where(Options.class)
+                        .equalTo("key", "notifvibrate")
+                        .findAll();
+                if(isChecked){
+                    realm.beginTransaction();
+                    result.get(0).setValue("1");
+                    realm.commitTransaction();
+                }else{
+                    realm.beginTransaction();
+                    result.get(0).setValue("0");
+                    realm.commitTransaction();
+                }
+            }
+        });
+
+        Switch s4 = (Switch) findViewById(R.id.sendS);
+        s4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Realm realm = Realm.getInstance(ProfileActivity.this);
+                RealmResults<Options> result = realm.where(Options.class)
+                        .equalTo("key", "sendwithenter")
+                        .findAll();
+                if (isChecked) {
+                    realm.beginTransaction();
+                    result.get(0).setValue("1");
+                    realm.commitTransaction();
+                } else {
+                    realm.beginTransaction();
+                    result.get(0).setValue("0");
+                    realm.commitTransaction();
+                }
+            }
+        });
+
+    }
+
 }

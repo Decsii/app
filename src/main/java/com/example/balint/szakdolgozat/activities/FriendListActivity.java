@@ -30,29 +30,55 @@ import com.example.balint.szakdolgozat.javaclasses.RequestListAdapter;
 
 import java.util.List;
 
-
+/**
+ * @author      Decsi Bálint
+ */
 public class FriendListActivity extends ActionBarActivity {
-
-    public final static String EXTRA_MESSAGE = "com.example.balint.szakdolgozat.MESSAGE";
+    /**
+     * Service
+     */
     private TCPService tcps;
+    /**
+     * Az activity hozzá van-e kötve a servicehez.
+     */
     private boolean mBound = false;
+    /**
+     * Listview a barátok és felkérések megjelenitéséhez.
+     */
     private ListView usersListView;
-    private ArrayAdapter<String> namesArrayAdapter;
+    /**
+     * Barátok nevének tárolása.
+     */
     private List<String> friendList;
-    private List<String> sendedList;
-    private List<String> requestList;
+    /**
+     * Jelenleg mit jelenitünk meg. (barátlista, felkérés lista)
+     */
     private int currentView;
+    /**
+     * A service és az activity közötti kommunikáció.
+     */
     private Handler messageHandler = new MessageHandler();
+    /**
+     * Hosszú kattintásnál felugró menü opciói.
+     */
     private String[] menuItems;
+    /**
+     * Adatpter barátlistához.
+     */
     private FriendListAdapter fla;
+    /**
+     * Adapted request listához.
+     */
     private RequestListAdapter rla;
 
+    /**
+     * A service és az activity közötti kommunikációért felelős osztály.
+     */
     public class MessageHandler extends Handler {
         @Override
         public void handleMessage(Message message) {
             int state = message.arg1;
             Intent intent;
-            String uz;
             Toast toast;
             switch (state) {
                 case 15:
@@ -60,8 +86,6 @@ public class FriendListActivity extends ActionBarActivity {
                     break;
                 case 2:
                     intent = new Intent(FriendListActivity.this, MainActivity.class);
-                    uz = "nomsg";
-                    intent.putExtra(EXTRA_MESSAGE, uz);
                     startActivity(intent);
                     break;
                 case 4:
@@ -96,29 +120,30 @@ public class FriendListActivity extends ActionBarActivity {
                 case 300:
                     toast = Toast.makeText(FriendListActivity.this, "Új barát felkrés érkezett", Toast.LENGTH_SHORT);
                     toast.show();
-                    if (currentView == 1){
+                    if (currentView == 1) {
                         writeRequests();
                     }
                     break;
                 case 301:
                     toast = Toast.makeText(FriendListActivity.this, "Barát felkérésedet elfogadták", Toast.LENGTH_SHORT);
                     toast.show();
-                    if (currentView == 1){
+                    if (currentView == 1) {
                         writeRequests();
-                    }else if( currentView == 0 ){
+                    } else if (currentView == 0) {
                         writeFriendList();
                     }
                     break;
                 case 900:
                     intent = new Intent(FriendListActivity.this, MessagingActivity.class);
-                    uz = "nomsg";
-                    intent.putExtra(EXTRA_MESSAGE, uz);
                     startActivity(intent);
                     break;
             }
         }
     }
 
+    /**
+     * Az activity csatlakozása a servicehez.
+     */
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -137,6 +162,7 @@ public class FriendListActivity extends ActionBarActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        //Csatlakozunk a servicehez.
         Intent intent = new Intent(this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         startService(intent);
@@ -146,6 +172,7 @@ public class FriendListActivity extends ActionBarActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        //Lecsatlakozunk a serviceről.
         if (mBound) {
             tcps.setFriendListActive(false);
             unbindService(mConnection);
@@ -180,23 +207,12 @@ public class FriendListActivity extends ActionBarActivity {
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        Log.d("éppen", "most");
         if (v.getId() == R.id.usersListView) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
             menu.setHeaderTitle("Menu");
-
             switch (currentView) {
                 case 0:
                     menuItems = new String[]{"Törlés"};
-                    break;
-                case 1:
-                    menuItems = new String[]{"Visszautasitás"};
-                    break;
-                case 2:
-                    menuItems = new String[]{""};
-                    break;
-                default:
-                    menuItems = new String[]{""};
                     break;
             }
             for (int i = 0; i < menuItems.length; i++) {
@@ -215,10 +231,6 @@ public class FriendListActivity extends ActionBarActivity {
                 listItemName = friendList.get(info.position);
                 tcps.deleteFriend(listItemName);
                 break;
-            case "Visszautasitás":
-                listItemName = requestList.get(info.position);
-                tcps.declineRequest(listItemName);
-                break;
         }
         return true;
     }
@@ -232,41 +244,31 @@ public class FriendListActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_torles) {
-            tcps.removeMyself();
-        }
-
-        if (id == R.id.action_kijelentkezes) {
-            tcps.logOut();
-            Intent intent = new Intent(FriendListActivity.this, MainActivity.class);
-            intent.putExtra(EXTRA_MESSAGE, "nomsg");
-            startActivity(intent);
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Felkérés lista gomb listener.
+     */
     private View.OnClickListener requestB = new View.OnClickListener() {
         public void onClick(View v) {
             writeRequests();
         }
     };
 
+    /**
+     * Profile gomb listener.
+     */
     private View.OnClickListener profileA = new View.OnClickListener() {
         public void onClick(View v) {
             Intent intent = new Intent(FriendListActivity.this, ProfileActivity.class);
-            String uz = "nomsg";
-            intent.putExtra(EXTRA_MESSAGE, uz);
             startActivity(intent);
         }
     };
 
+    /**
+     * Add friend gomb listener.( Az input mező megjelenitése. )
+     */
     private View.OnClickListener showAddFriend = new View.OnClickListener() {
         public void onClick(View v) {
             LinearLayout laout = (LinearLayout) findViewById(R.id.addFriendField);
@@ -278,12 +280,18 @@ public class FriendListActivity extends ActionBarActivity {
         }
     };
 
+    /**
+     * Friendlist gomb listener.
+     */
     private View.OnClickListener writeFriendListB = new View.OnClickListener() {
         public void onClick(View v) {
             writeFriendList();
         }
     };
 
+    /**
+     * Add friend gomb listener.
+     */
     private View.OnClickListener addFriend = new View.OnClickListener() {
         public void onClick(View v) {
             EditText et = (EditText) findViewById(R.id.addFriendT);
@@ -291,6 +299,9 @@ public class FriendListActivity extends ActionBarActivity {
         }
     };
 
+    /**
+     * Barátok listázása a listviewba.
+     */
     private void writeFriendList() {
         currentView = 0;
         friendList = tcps.getFriendsString();
@@ -305,8 +316,8 @@ public class FriendListActivity extends ActionBarActivity {
         usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int i, long l) {
-                Log.d(friendList.get(i), "" + i);
-                tcps.startConv(friendList.get(i),fla.getLastActive(i), tcps.getFriendList().get(i).isLoggedin());
+                //Log.d(friendList.get(i), "" + i);
+                tcps.startConv(friendList.get(i), fla.getLastActive(i), tcps.getFriendList().get(i).isLoggedin());
             }
         });
 
@@ -314,74 +325,58 @@ public class FriendListActivity extends ActionBarActivity {
 
     }
 
+    /**
+     * Felkérések listázása a listviewba.
+     */
     private void writeRequests() {
         currentView = 1;
-        requestList = tcps.getRequestsString();
 
         usersListView.setAdapter(rla);
         rla.clearList();
 
-        rla.addFriend(new FriendListItem(-1, "", "", "", false, 0, 3));
+        if (tcps.getFriendRequests().size() != 0) {
+            rla.addFriend(new FriendListItem(-1, "", "", "", false, 0, 3));
+        }
         for (FriendListItem s : tcps.getFriendRequests()) {
             rla.addFriend(s);
         }
-
-        rla.addFriend(new FriendListItem(-1,"","","",false,0,4));
+        if (tcps.getSendedRequests().size() != 0) {
+            rla.addFriend(new FriendListItem(-1, "", "", "", false, 0, 4));
+        }
         for (FriendListItem s : tcps.getSendedRequests()) {
             rla.addFriend(s);
         }
 
-
-        /*
-        namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.user_list_item, requestList);
-        usersListView.setAdapter(namesArrayAdapter);
-
-        usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> a, View v, int i, long l) {
-                tcps.acceptRequest(requestList.get(i));
-                Log.d(requestList.get(i), "" + i);
-            }
-        });*/
-
         registerForContextMenu(usersListView);
 
     }
-/*
-    private void writeSended() {
-        currentView = 2;
-        sendedList = tcps.getSendedString();
-        namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.user_list_item, sendedList);
-        usersListView.setAdapter(namesArrayAdapter);
-
-        usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> a, View v, int i, long l) {
-                tcps.undoRequest(sendedList.get(i));
-                Log.d(sendedList.get(i), "" + i);
-            }
-        });
-
-        registerForContextMenu(usersListView);
-    }*/
-
-
-    private void refreshFriendItem(){
+    /**
+     * Egy adapter elem frissitése.
+     */
+    private void refreshFriendItem() {
         fla.refreshFriend(tcps.getRefreshQ().poll());
     }
 
+    /**
+     * Ha csatlakoztunk a servicehez, akkor fut le.
+     */
     private void onServiceReady() {
         mBound = true;
         Intent intent = new Intent(FriendListActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
-        rla = new RequestListAdapter(this,tcps);
+        if(!tcps.isLogedIn()){
+            intent = new Intent(FriendListActivity.this, MainActivity.class);
+            startActivity(intent);
+            return;
+        }
+        rla = new RequestListAdapter(this, tcps);
         tcps.setCurrentPartner(-1);
         tcps.setFriendListActive(true);
-        Log.d("", "FRIEND REQUEST");
-        if (!tcps.requestedyet){
+        //Log.d("", "FRIEND REQUEST");
+        if (!tcps.isRequestedyet()) {
             tcps.requestFriendList();
-        }else{
+        } else {
             writeFriendList();
         }
     }

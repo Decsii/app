@@ -16,6 +16,7 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -38,19 +39,42 @@ import io.realm.RealmResults;
 
 
 public class MessagingActivity extends ActionBarActivity {
-
-    public final static String EXTRA_MESSAGE = "com.example.balint.szakdolgozat.MESSAGE";
-    public EditText et;
-
+    /**
+     * Service
+     */
     private TCPService tcps;
+    /**
+     * Az activity hozzá van-e kötve a servicehez.
+     */
     private boolean mBound = false;
+    /**
+     * Adapter üzenetekhez.
+     */
     private MessageAdapter messageAdapter;
+    /**
+     * Listview üzenetek megjelenitésére.
+     */
     private ListView messagesList;
+    /**
+     * Üzeneteket tároló lista.
+     */
     private List<String> messageList = new ArrayList<>();
+    /**
+     * Üzenet küldés input mező.
+     */
     private EditText messageF;
-    private Button sendB;
+    /**
+     * Görgetés kikapcsolása a listviewn.
+     */
+    private boolean scrollD = false;
+    /**
+     * A service és az activity közötti kommunikáció.
+     */
     private Handler messageHandler = new MessageHandler();
 
+    /**
+     * A service és az activity közötti kommunikációért felelős osztály.
+     */
     public class MessageHandler extends Handler {
         @Override
         public void handleMessage(android.os.Message message) {
@@ -64,6 +88,9 @@ public class MessagingActivity extends ActionBarActivity {
                 case 10:
                     //msgRecieved();
                     break;
+                case 11:
+                    loadMoreMessages();
+                    break;
                 case 16:
                     msgRecieved();
                     break;
@@ -71,6 +98,9 @@ public class MessagingActivity extends ActionBarActivity {
         }
     }
 
+    /**
+     * Az activity csatlakozása a servicehez.
+     */
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -114,7 +144,7 @@ public class MessagingActivity extends ActionBarActivity {
 
         messageF = (EditText) findViewById(R.id.messageF);
 
-        sendB = (Button) findViewById(R.id.sendB);
+        Button sendB = (Button) findViewById(R.id.sendB);
         sendB.setOnClickListener(sendBclick);
 
         messagesList = (ListView) findViewById(R.id.listMessages);
@@ -144,87 +174,102 @@ public class MessagingActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Üzenet elküldése
+     */
     private View.OnClickListener sendBclick = new View.OnClickListener() {
         public void onClick(View v) {
-            if (messageF.getText().toString() != "") {
-                tcps.send(messageF.getText().toString());
-                messageList.add(messageF.getText().toString());
-                Spannable sp = getSmiledText(MessagingActivity.this,messageF.getText());
-                messageAdapter.addMessage(sp, MessageAdapter.DIRECTION_OUTGOING);
-                tcps.messagesList.add(new Pair(messageF.getText().toString(), 1));
-                messageF.setText("");
-            }
+            tcps.send(messageF.getText().toString());
+            messageList.add(messageF.getText().toString());
+            Spannable sp = getSmiledText(MessagingActivity.this, messageF.getText());
+            messageAdapter.addMessage(sp, MessageAdapter.DIRECTION_OUTGOING);
+            tcps.messagesList.add(new Pair(messageF.getText().toString(), 1));
+            messageF.setText("");
         }
     };
 
+    /**
+     * Listview görgetés listener.
+     */
+    AbsListView.OnScrollListener lwScrollListener = new AbsListView.OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+            if (listIsAtTop()){
+                if (scrollD){
+                    scrollD = false;
+                    return;
+                }
+                tcps.getMoreMsg(tcps.getCurrentPartner(),tcps.getCurrentFirstMsgid(),2);
+            }
+        }
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        }
+    };
+
+    /**
+     * Üzenetet kaptunk. Jelenitsük meg.
+     */
     private void msgRecieved() {
-        Spannable sp = getSmiledText(this,tcps.getMsgQ().poll());
+        Spannable sp = getSmiledText(this, tcps.getMsgQ().poll());
         messageAdapter.addMessage(sp, MessageAdapter.DIRECTION_INCOMING);
-        //List<String> asd = new ArrayList<>();
-        //List<Integer> asd2 = new ArrayList<>();
-        //for (DBMessage msg : result) {
-        //    asd.add(msg.getMsg());
-        //    asd2.add(msg.getFromid());
-        //}
-        //Log.d("", asd.toString());
-        //for (int i = 0; i < asd.size(); i++) {
-        //    String message = asd.get(i);
-        //    if (tcps.myId == asd2.get(i)) {
-        //        messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
-        //    } else {
-        //        messageAdapter.addMessage(message, MessageAdapter.DIRECTION_INCOMING);
-        //    }
-        //}
-        //messageAdapter.addMessage(tcps.currUz, MessageAdapter.DIRECTION_INCOMING);
     }
 
-    private void populateMessageHistory() {
-
+    /**
+     * Üzenetek megjelenitése.
+     */
+    private void writeMessageHistory() {
         Realm realm = Realm.getInstance(this);
 
-        //RealmResults<DBMessage> result = realm.where(DBMessage.class)
-        //        .equalTo("fromid", tcps.currentPartner)
-        //        .or()
-        //        .equalTo("fromid", tcps.myId)
-        //        .findAll();
-
         RealmResults<DBMessage> result2 = realm.where(DBMessage.class).findAll();
-        Log.d("", result2.toString());
-        Log.d("test1", tcps.currentPartner + " " + tcps.myId);
+        //Log.d("", result2.toString());
+        //Log.d("test1", tcps.currentPartner + " " + tcps.getMyId());
         RealmResults<DBMessage> result = realm.where(DBMessage.class)
                 .beginGroup()
-                .equalTo("fromid", tcps.currentPartner)
-                .equalTo("toid", tcps.myId)
+                .equalTo("fromid", tcps.getCurrentPartner())
+                .equalTo("toid", tcps.getMyId())
                 .endGroup()
                 .or()
                 .beginGroup()
-                .equalTo("fromid", tcps.myId)
-                .equalTo("toid", tcps.currentPartner)
+                .equalTo("fromid", tcps.getMyId())
+                .equalTo("toid", tcps.getCurrentPartner())
                 .endGroup()
                 .findAll();
 
-        Log.d("", result.toString());
+        //Log.d("", result.toString());
         result.sort("msgid");
         List<String> asd = new ArrayList<>();
         List<Integer> asd2 = new ArrayList<>();
+        if (result.size() != 0)tcps.setCurrentFirstMsgid(result.get(0).getMsgid());
         for (DBMessage msg : result) {
             asd.add(msg.getMsg());
             asd2.add(msg.getFromid());
         }
 
-
-        Log.d("", asd.toString());
+        //Log.d("", asd.toString());
         for (int i = 0; i < asd.size(); i++) {
             String message = asd.get(i);
-            Spannable sp = getSmiledText(this,message);
-            if (tcps.myId == asd2.get(i)) {
+            Spannable sp = getSmiledText(this, message);
+            if (tcps.getMyId() == asd2.get(i)) {
                 messageAdapter.addMessage(sp, MessageAdapter.DIRECTION_OUTGOING);
             } else {
                 messageAdapter.addMessage(sp, MessageAdapter.DIRECTION_INCOMING);
             }
         }
+        messagesList.setOnScrollListener(lwScrollListener);
     }
 
+    /**
+     * Listviewt teljesen felgörgettük-e.
+     */
+    private boolean listIsAtTop() {
+        if (messagesList.getChildCount() == 0) return true;
+        return messagesList.getChildAt(0).getTop() == 0;
+    }
+
+    /**
+     * Ha csatlakoztunk a servicehez, akkor fut le.
+     */
     private void onServiceReady() {
         Intent intent;
         mBound = true;
@@ -233,13 +278,13 @@ public class MessagingActivity extends ActionBarActivity {
         tcps.onBind(intent);
 
         intent = getIntent();
-        int id = intent.getIntExtra("id",-1);
+        int id = intent.getIntExtra("id", -1);
 
-        if ( id != -1 ){
+        if (id != -1) {
             //start conv cucait beállitjuk
             List<FriendListItem> friends = tcps.getFriendList();
-            for( FriendListItem f : friends ){
-                if ( id == f.getUserid() ){
+            for (FriendListItem f : friends) {
+                if (id == f.getUserid()) {
                     tcps.setCurrentPartner(id);
                     tcps.setCurrentPartnerName(f.getName());
                     tcps.setLastActive(f.getTime());
@@ -251,12 +296,39 @@ public class MessagingActivity extends ActionBarActivity {
         TextView tw2 = (TextView) findViewById(R.id.lastV);
         tw.setText(tcps.getCurrentPartnerName());
         tw2.setText(tcps.getLastActive());
-        populateMessageHistory();
+        writeMessageHistory();
+    }
+
+    /**
+     * Több üzenet betöltése, ha elértük a listview tetejét..
+     */
+    private void loadMoreMessages() {
+        List<Pair<Integer, String>> list = tcps.getTenMoreMessage();
+        final int size = list.size();
+        for (int i = list.size() - 1; i >= 0; i--) {
+            String message = list.get(i).second;
+            Spannable sp = getSmiledText(this, message);
+            if (tcps.getMyId() == list.get(i).first) {
+                messageAdapter.addMessageFirst(sp, MessageAdapter.DIRECTION_OUTGOING);
+            } else {
+                messageAdapter.addMessageFirst(sp, MessageAdapter.DIRECTION_INCOMING);
+            }
+        }
+        messagesList.post(new Runnable() {
+            @Override
+            public void run() {
+                // Select the last row so it will scroll into view...
+                scrollD = true;
+                messagesList.setSelection(size);
+            }
+        });
     }
 
     private final Spannable.Factory spannableFactory = Spannable.Factory.getInstance();
+    /**
+     * Smileyikat tároló map.
+     */
     private static final Map<Pattern, Integer> emoticons = new HashMap<Pattern, Integer>();
-
     {
         addPattern(emoticons, ":)", R.drawable.smile_emo);
         addPattern(emoticons, ":D", R.drawable.happy_emo);
@@ -265,10 +337,16 @@ public class MessagingActivity extends ActionBarActivity {
         addPattern(emoticons, ":(", R.drawable.sad_emo);
     }
 
+    /**
+     * Smiley hozzáadása.
+     */
     private void addPattern(Map<Pattern, Integer> map, String smile, int resource) {
         map.put(Pattern.compile(Pattern.quote(smile)), resource);
     }
 
+    /**
+     * Üzenet tartalmaz-e smileyt.
+     */
     public boolean addSmiles(Context context, Spannable spannable) {
         boolean hasChanges = false;
         for (Map.Entry<Pattern, Integer> entry : emoticons.entrySet()) {
@@ -286,7 +364,7 @@ public class MessagingActivity extends ActionBarActivity {
                     }
                 if (set) {
                     hasChanges = true;
-                    spannable.setSpan(new ImageSpan( context , entry.getValue()),
+                    spannable.setSpan(new ImageSpan(context, entry.getValue()),
                             matcher.start(), matcher.end(),
                             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
@@ -295,6 +373,9 @@ public class MessagingActivity extends ActionBarActivity {
         return hasChanges;
     }
 
+    /**
+     * @return Üzenet a smileyval.
+     */
     public Spannable getSmiledText(Context context, CharSequence text) {
         Spannable spannable = spannableFactory.newSpannable(text);
         addSmiles(context, spannable);

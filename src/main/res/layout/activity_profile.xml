@@ -22,7 +22,8 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="60dp"
-        android:id="@+id/textView"
+        android:textColor="@color/sinch_purple"
+        android:id="@+id/profileName"
         android:textSize="35sp"
         android:text="Decsi Bálint"/>
 
@@ -37,7 +38,9 @@
             android:layout_height="fill_parent"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Notification"
+            android:textSize="20sp"
             android:gravity="center_vertical"
+            android:textColor="@color/sinch_purple"
             android:id="@+id/textView2"
             android:layout_weight="1" />
 
@@ -60,8 +63,10 @@
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/sinch_purple"
             android:text="Notification sound"
             android:gravity="center_vertical"
+            android:textSize="20sp"
             android:id="@+id/textView3"
             android:layout_weight="1" />
 
@@ -84,8 +89,10 @@
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/sinch_purple"
             android:gravity="center_vertical"
             android:text="Notification vibrate"
+            android:textSize="20sp"
             android:id="@+id/textView4"
             android:layout_weight="1" />
 
@@ -107,8 +114,10 @@
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/sinch_purple"
             android:gravity="center_vertical"
             android:text="Send with enter"
+            android:textSize="20sp"
             android:id="@+id/textView5"
             android:layout_weight="1" />
 
@@ -119,5 +128,25 @@
             android:layout_gravity="center_vertical"
             android:checked="false" />
     </LinearLayout>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="35dp"
+        android:textSize="22sp"
+        android:textColor="@color/sinch_purple"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Kijelentkezés"
+        android:id="@+id/Logout"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="35dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Törlöm magam"
+        android:textSize="22sp"
+        android:textColor="@color/sinch_purple"
+        android:id="@+id/removeMyself"
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>
