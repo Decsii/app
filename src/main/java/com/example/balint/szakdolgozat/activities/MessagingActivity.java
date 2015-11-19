@@ -183,7 +183,6 @@ public class MessagingActivity extends ActionBarActivity {
             messageList.add(messageF.getText().toString());
             Spannable sp = getSmiledText(MessagingActivity.this, messageF.getText());
             messageAdapter.addMessage(sp, MessageAdapter.DIRECTION_OUTGOING);
-            tcps.messagesList.add(new Pair(messageF.getText().toString(), 1));
             messageF.setText("");
         }
     };
@@ -277,6 +276,12 @@ public class MessagingActivity extends ActionBarActivity {
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
 
+        if(!tcps.isLogedIn()){
+            intent = new Intent(MessagingActivity.this, MainActivity.class);
+            startActivity(intent);
+            return;
+        }
+
         intent = getIntent();
         int id = intent.getIntExtra("id", -1);
 
@@ -303,7 +308,7 @@ public class MessagingActivity extends ActionBarActivity {
      * Több üzenet betöltése, ha elértük a listview tetejét..
      */
     private void loadMoreMessages() {
-        List<Pair<Integer, String>> list = tcps.getTenMoreMessage();
+        List<Pair<Integer, String>> list = tcps.getMoreMessages();
         final int size = list.size();
         for (int i = list.size() - 1; i >= 0; i--) {
             String message = list.get(i).second;
