@@ -82,17 +82,19 @@ public class MessagingActivity extends ActionBarActivity {
             Intent intent;
             String uz;
             switch (state) {
-                case 13:
-                    Log.d("service", "kézbesitbe");
-                    break;
-                case 10:
-                    //msgRecieved();
+                case 2:
+                    intent = new Intent(MessagingActivity.this, MainActivity.class);
+                    startActivity(intent);
                     break;
                 case 11:
                     loadMoreMessages();
                     break;
                 case 16:
                     msgRecieved();
+                    break;
+                case 30:
+                    Log.d("vissze","alitottam");
+                    scrollD = false;
                     break;
             }
         }
@@ -195,10 +197,11 @@ public class MessagingActivity extends ActionBarActivity {
         public void onScrollStateChanged(AbsListView view, int scrollState) {
             if (listIsAtTop()){
                 if (scrollD){
-                    scrollD = false;
+                    Log.d("ititit","ititi");
                     return;
                 }
-                tcps.getMoreMsg(tcps.getCurrentPartner(),tcps.getCurrentFirstMsgid(),2);
+                scrollD = true;
+                tcps.getMoreMsg(tcps.getCurrentPartner(),tcps.getCurrentFirstMsgid(),10);
             }
         }
         @Override
@@ -322,9 +325,19 @@ public class MessagingActivity extends ActionBarActivity {
         messagesList.post(new Runnable() {
             @Override
             public void run() {
-                // Select the last row so it will scroll into view...
                 scrollD = true;
                 messagesList.setSelection(size);
+                Thread t2 = new Thread() {
+                    public void run() {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        scrollD = false;
+                    }
+                };
+                t2.start();
             }
         });
     }

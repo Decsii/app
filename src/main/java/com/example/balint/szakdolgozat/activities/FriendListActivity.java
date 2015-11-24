@@ -11,6 +11,7 @@ import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,12 +24,17 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.balint.szakdolgozat.javaclasses.DBMessage;
 import com.example.balint.szakdolgozat.javaclasses.FriendListAdapter;
 import com.example.balint.szakdolgozat.javaclasses.FriendListItem;
 import com.example.balint.szakdolgozat.R;
+import com.example.balint.szakdolgozat.javaclasses.Options;
 import com.example.balint.szakdolgozat.javaclasses.RequestListAdapter;
 
 import java.util.List;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 /**
  * @author      Decsi Bálint
@@ -107,6 +113,11 @@ public class FriendListActivity extends ActionBarActivity {
                     toast = Toast.makeText(FriendListActivity.this, "Barát felkérés elküldve", Toast.LENGTH_SHORT);
                     toast.show();
                     writeRequests();
+                    break;
+                case 12:
+                    toast = Toast.makeText(FriendListActivity.this, "Üzenetek törölve", Toast.LENGTH_SHORT);
+                    toast.show();
+                    refreshFriendItem();
                     break;
                 case 16:
                     writeFriendList();
@@ -212,7 +223,7 @@ public class FriendListActivity extends ActionBarActivity {
             menu.setHeaderTitle("Menu");
             switch (currentView) {
                 case 0:
-                    menuItems = new String[]{"Törlés"};
+                    menuItems = new String[]{"Barát törlése","Üzenetek törlése"};
                     break;
             }
             for (int i = 0; i < menuItems.length; i++) {
@@ -227,9 +238,28 @@ public class FriendListActivity extends ActionBarActivity {
         int menuItemIndex = item.getItemId();
         String listItemName;
         switch (menuItems[menuItemIndex]) {
-            case "Törlés":
+            case "Barát törlése":
                 listItemName = friendList.get(info.position);
                 tcps.deleteFriend(listItemName);
+                break;
+            case "Üzenetek törlése":
+                Realm realm = Realm.getInstance(this);
+                RealmResults<DBMessage> result = realm.where(DBMessage.class)
+                        .beginGroup()
+                        .equalTo("fromid", tcps.getMyId())
+                        .equalTo("toid", tcps.getFriendList().get(info.position).getUserid())
+                        .endGroup()
+                        .or()
+                        .beginGroup()
+                        .equalTo("fromid", tcps.getFriendList().get(info.position).getUserid())
+                        .equalTo("toid", tcps.getMyId())
+                        .endGroup()
+                        .findAll();
+                int maxmsgid = result.max("msgid").intValue();
+                tcps.deleteMessages(tcps.getFriendList().get(info.position).getUserid(),maxmsgid, info.position);
+                realm.beginTransaction();
+                result.clear();
+                realm.commitTransaction();
                 break;
         }
         return true;

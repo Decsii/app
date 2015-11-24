@@ -19,65 +19,111 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Regisztráció"
             android:id="@+id/textView4"
             android:layout_weight="0.07"
+            android:textColor="@color/sinch_purple"
+            android:textSize="30sp"
             android:autoText="false"
             android:textAlignment="center" />
 
         <TextView
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:text="E-mail"
-            android:id="@+id/textView5"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="0.02" />
-
-        <EditText
-            android:layout_width="297dp"
-            android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
-            android:ems="10"
-            android:id="@+id/remailText"
-            android:layout_gravity="center_horizontal" />
-
-        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/sinch_purple"
             android:text="Felhasználónév"
             android:id="@+id/textView6"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp" />
+
 
         <EditText
-            android:layout_width="291dp"
-            android:layout_height="wrap_content"
             android:id="@+id/ruserText"
+            android:layout_width="280dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="8dp"
+            android:inputType="text"
+            android:textSize="12sp"
+            android:padding="10dp"
+            android:textColor="@color/sinch_purple"
             android:layout_gravity="center_horizontal"
-            android:layout_weight="0.04" />
+            android:background="@drawable/inputbox"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:paddingLeft="10dp">
+        </EditText>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Jelszó"
             android:id="@+id/nameV"
+            android:textColor="@color/sinch_purple"
             android:layout_gravity="center_horizontal" />
 
         <EditText
-            android:layout_width="285dp"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:ems="10"
             android:id="@+id/rpasswordText"
+            android:layout_width="280dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="8dp"
+            android:inputType="text"
+            android:textSize="12sp"
+            android:padding="10dp"
+            android:textColor="@color/sinch_purple"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/inputbox"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:paddingLeft="10dp">
+        </EditText>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jelszó megerősítése"
+            android:id="@+id/nameV2"
+            android:textColor="@color/sinch_purple"
             android:layout_gravity="center_horizontal" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:text="Reigsztrálok"
-            android:id="@+id/registB"
+        <EditText
+            android:id="@+id/rrpasswordText"
+            android:layout_width="280dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="8dp"
+            android:inputType="text"
+            android:textSize="12sp"
+            android:padding="10dp"
+            android:textColor="@color/sinch_purple"
             android:layout_gravity="center_horizontal"
-            android:onClick="registration" />
+            android:background="@drawable/inputbox"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:paddingLeft="10dp">
+        </EditText>
+
+        <Button
+            android:id="@+id/registB"
+            android:layout_width="115dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_horizontal"
+            android:text="Regisztrálok"
+            android:textSize="15sp"
+            android:textColor="#fff"
+            android:background="@drawable/button_signup"
+            android:layout_marginTop="10dp" />
+
+        <Button
+            android:id="@+id/rbackB"
+            android:layout_width="115dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_horizontal"
+            android:text="Vissza"
+            android:textSize="15sp"
+            android:textColor="#fff"
+            android:background="@drawable/button_signup"
+            android:layout_marginTop="10dp" />
 
     </LinearLayout>
 </RelativeLayout>

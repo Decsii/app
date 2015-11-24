@@ -13,14 +13,15 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.balint.szakdolgozat.R;
 
 
 public class RegistrationActivity extends ActionBarActivity {
 
-    public final static String EXTRA_MESSAGE = "com.example.balint.szakdolgozat.MESSAGE";
     private TCPService tcps;
     private boolean mBound = false;
 
@@ -33,8 +34,6 @@ public class RegistrationActivity extends ActionBarActivity {
             switch (state) {
                 case 0:
                     intent = new Intent(RegistrationActivity.this, FriendListActivity.class);
-                    uz = "nomsg";
-                    intent.putExtra(EXTRA_MESSAGE, uz);
                     startActivity(intent);
                     break;
             }
@@ -85,8 +84,26 @@ public class RegistrationActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
+
+        Button b1 = (Button) findViewById(R.id.registB);
+        b1.setOnClickListener(registrationA);
+
+        Button b2 = (Button) findViewById(R.id.rbackB);
+        b2.setOnClickListener(backA);
+
     }
 
+    private View.OnClickListener registrationA = new View.OnClickListener() {
+        public void onClick(View v) {
+            registration();
+        }
+    };
+
+    private View.OnClickListener backA = new View.OnClickListener() {
+        public void onClick(View v) {
+            startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
+        }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -110,11 +127,19 @@ public class RegistrationActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void registration(View v) {
+    private void registration() {
         EditText userName = (EditText) findViewById(R.id.ruserText);
         EditText pass = (EditText) findViewById(R.id.rpasswordText);
-        if (userName.getText().toString() != "" && pass.getText().toString() != "") {
+        EditText pass2 = (EditText) findViewById(R.id.rrpasswordText);
+        if( userName.getText().toString().equals("") ){
+            Toast.makeText(RegistrationActivity.this, "Töltse ki a felhasználónév mezőt", Toast.LENGTH_SHORT).show();
+        }else if( pass.getText().toString().equals("")  || pass2.getText().toString().equals("") ){
+            Toast.makeText(RegistrationActivity.this, "Töltse ki a jelszómezőt", Toast.LENGTH_SHORT).show();
+        }
+        if( pass.getText().toString().equals(pass2.getText().toString()) ){
             tcps.registration(userName.getText().toString(), pass.getText().toString());
+        }else{
+            Toast.makeText(RegistrationActivity.this, "Két jelsző nem egyezik", Toast.LENGTH_SHORT).show();
         }
     }
 

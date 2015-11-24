@@ -156,7 +156,7 @@ public class MainActivity extends ActionBarActivity {
     /**
      * Bejelentkezés
      */
-    public void logIn() {
+    private void logIn() {
         EditText userName = (EditText) findViewById(R.id.usernameText);
         EditText pass = (EditText) findViewById(R.id.passwordText);
         if (userName.getText().toString() != "" && pass.getText().toString() != "") {
@@ -167,7 +167,7 @@ public class MainActivity extends ActionBarActivity {
     /**
      * Regisztráció
      */
-    public void toRegistration() {
+    private void toRegistration() {
         Intent intent = new Intent(this, RegistrationActivity.class);
         startActivity(intent);
     }

@@ -56,7 +56,9 @@ public class ProfileActivity extends ActionBarActivity {
             Toast toast;
             String uz;
             switch (state) {
-                case 0:
+                case 2:
+                    intent = new Intent(ProfileActivity.this, MainActivity.class);
+                    startActivity(intent);
                     break;
             }
         }

@@ -275,6 +275,7 @@ public class TCPService extends Service {
                         dis.readFully(bytes);
                         str = new String(bytes);
                     } catch (IOException e) {
+                        logOut();
                         startTCP();
                         stopRefresh = true;
                         logedIn = false;
@@ -748,6 +749,10 @@ public class TCPService extends Service {
                     break;
                 case "11":
                     getMoreMessageHandler(jsonRootObject.optJSONArray("messages"));
+                    sendMessage(30);
+                    break;
+                case "12":
+                    sendMessage(12);
                     break;
                 case "13":
                     sendMessageHandler(jsonRootObject.optJSONObject("message"));
@@ -1524,6 +1529,21 @@ public class TCPService extends Service {
         }
     }
 
+    public void deleteMessages(int userid,int msgid, int ind) {
+        String msg = "{\"type\":12, \"userid\":" + userid + ",\"msgid\":" + msgid + "}";
+        byte[] bytes = msg.getBytes();
+        try {
+            dos.writeInt(bytes.length);
+            dos.write(bytes);
+            dos.flush();
+        } catch (Exception e) {
+            Log.d("hiba", "deleteMessages küldési hiba ");
+        }
+        refreshQ.add(new Pair<Integer, FriendListItem>(ind, friendList.get(ind)));
+        friendList.get(ind).setLstMsg("");
+        friendList.get(ind).setTime("");
+    }
+
     public String getCurrentPartnerName() {
         return currentPartnerName;
     }
@@ -1550,10 +1570,6 @@ public class TCPService extends Service {
 
     public List<FriendListItem> getSendedRequests() {
         return sendedRequests;
-    }
-
-    public void logMe(String str) {
-        Log.d("logthis", str);
     }
 
     public boolean isLogedIn() {

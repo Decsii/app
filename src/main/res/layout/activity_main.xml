@@ -38,7 +38,6 @@
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:paddingLeft="10dp">
-            <requestFocus/>
         </EditText>
 
         <TextView
@@ -50,6 +49,7 @@
             android:layout_gravity="center_horizontal"
             android:textColor="@color/sinch_purple"
             android:textSize="20sp"/>
+
         <EditText
             android:id="@+id/passwordText"
             android:layout_width="280dp"
