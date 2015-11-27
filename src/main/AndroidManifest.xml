@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.balint.szakdolgozat" >
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <application
@@ -12,33 +11,31 @@
         <activity
             android:name=".activities.MainActivity"
             android:noHistory="true"
-            android:screenOrientation="portrait" >
-            android:label="@string/app_name" >
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name=".activities.TCPService" />
+
         <activity
             android:name=".activities.MessagingActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_messaging" >
         </activity>
         <activity
             android:name=".activities.RegistrationActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_registration" >
         </activity>
         <activity
             android:name=".activities.FriendListActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_friend_list" >
         </activity>
-
-        <service
-            android:name=".activities.TCPService"
-            />
 
         <activity
             android:name=".activities.ProfileActivity"

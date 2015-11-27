@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Regisztráció"
+            android:text="@string/regisztracio"
             android:id="@+id/textView4"
             android:layout_weight="0.07"
             android:textColor="@color/sinch_purple"
@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/sinch_purple"
-            android:text="Felhasználónév"
+            android:text="@string/felhasznalonev"
             android:id="@+id/textView6"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="30dp" />
@@ -58,7 +58,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Jelszó"
+            android:text="@string/jelszo"
             android:id="@+id/nameV"
             android:textColor="@color/sinch_purple"
             android:layout_gravity="center_horizontal" />
@@ -82,7 +82,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Jelszó megerősítése"
+            android:text="@string/jelszo2"
             android:id="@+id/nameV2"
             android:textColor="@color/sinch_purple"
             android:layout_gravity="center_horizontal" />
@@ -108,7 +108,7 @@
             android:layout_width="115dp"
             android:layout_height="40dp"
             android:layout_gravity="center_horizontal"
-            android:text="Regisztrálok"
+            android:text="@string/regisztralok"
             android:textSize="15sp"
             android:textColor="#fff"
             android:background="@drawable/button_signup"
@@ -119,7 +119,7 @@
             android:layout_width="115dp"
             android:layout_height="40dp"
             android:layout_gravity="center_horizontal"
-            android:text="Vissza"
+            android:text="@string/vissza"
             android:textSize="15sp"
             android:textColor="#fff"
             android:background="@drawable/button_signup"

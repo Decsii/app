@@ -19,9 +19,9 @@ public class MyOnClickListener implements View.OnClickListener {
         return username;
     }
 
-    public void setUsername(String username) {
+    /*public void setUsername(String username) {
         this.username = username;
-    }
+    }*/
 
     @Override
     public void onClick(View v) {

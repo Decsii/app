@@ -386,6 +386,7 @@ public class TCPService extends Service {
      * Kijelentkezési kérelem kezelése.
      */
     public void logOut() {
+        if ( socket == null || logedIn==false ) return;
         Realm realm  = Realm.getInstance(this);
         RealmResults<Options> result = realm.where(Options.class)
                 .equalTo("key", "sid")

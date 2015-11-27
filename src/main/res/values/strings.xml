@@ -4,11 +4,21 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_torles">Torles</string>
-    <string name="title_activity_messaging">Messaging</string>
-    <string name="title_activity_registration">RegistrationActivity</string>
-    <string name="title_activity_friend_list">FriendListActivity</string>
+    <string name="title_activity_messaging">Üzenetek</string>
+    <string name="title_activity_registration">Regisztráció</string>
+    <string name="title_activity_friend_list">Barát/Felkérés lista</string>
+    <string name="title_activity_main">Bejelentkezés</string>
     <string name="message_elipses">Message...</string>
-    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_profile">Profil</string>
+
+    <string name="felhasznalonev">Felhasználónév</string>
+    <string name="jelszo">Jelszó</string>
+    <string name="bejelentkezes">Bejelentkezés</string>
+    <string name="regisztracio">Regisztráció</string>
+    <string name="jelszo2">Jelszó megerősitése</string>
+    <string name="regisztralok">Regisztrálok</string>
+    <string name="vissza">Vissza</string>
+    <string name="barathozzaadas">Barát hozzáadása</string>
 
 </resources>
 

@@ -20,7 +20,6 @@ public class RoundedImageView extends ImageView {
 
     public RoundedImageView(Context context) {
         super(context);
-        // TODO Auto-generated constructor stub
     }
 
     public RoundedImageView(Context context, AttributeSet attrs) {
@@ -33,7 +32,6 @@ public class RoundedImageView extends ImageView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-
         Drawable drawable = getDrawable();
 
         if (drawable == null) {
@@ -45,11 +43,8 @@ public class RoundedImageView extends ImageView {
         }
         Bitmap b =  ((BitmapDrawable)drawable).getBitmap() ;
         Bitmap bitmap = b.copy(Bitmap.Config.ARGB_8888, true);
-
-        int w = getWidth(), h = getHeight();
-
-
-        Bitmap roundBitmap =  getCroppedBitmap(bitmap, w);
+        int w = getWidth();
+        Bitmap roundBitmap = getCroppedBitmap(bitmap, w);
         canvas.drawBitmap(roundBitmap, 0,0, null);
 
     }
@@ -64,9 +59,8 @@ public class RoundedImageView extends ImageView {
                 sbmp.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
 
-        final int color = 0xffa19774;
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, sbmp.getWidth(), sbmp.getHeight());
+        Paint paint = new Paint();
+        Rect rect = new Rect(0, 0, sbmp.getWidth(), sbmp.getHeight());
 
         paint.setAntiAlias(true);
         paint.setFilterBitmap(true);
@@ -77,7 +71,6 @@ public class RoundedImageView extends ImageView {
                 sbmp.getWidth() / 2+0.1f, paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(sbmp, rect, rect, paint);
-
 
         return output;
     }

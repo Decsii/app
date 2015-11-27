@@ -19,7 +19,7 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="35dp"
-            android:text="  add friend  "
+            android:text="@string/barathozzaadas"
             android:id="@+id/addFriendB"
             android:textSize="13sp"
             android:textColor="#fff"

@@ -14,15 +14,15 @@ public class DBMessage extends RealmObject {
     private int toid;
     private String msg;
     private double t;
-    private int seen;
+    //private int seen;
 
-    public int getSeen() {
+    /*public int getSeen() {
         return seen;
     }
 
     public void setSeen(int seen) {
         this.seen = seen;
-    }
+    }*/
 
     public String getTo() {
         return to;
