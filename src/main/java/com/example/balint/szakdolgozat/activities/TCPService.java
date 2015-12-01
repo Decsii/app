@@ -429,7 +429,7 @@ public class TCPService extends Service {
             if (friendRequests.size() == numOfRequests) {
                 requestS = false;
                 numOfRequests = 0;
-                sendedRequests();
+                outgoingRequests();
             } else {
                 userInfoByID(friendRequests.get(numOfRequests).getUserid());
                 numOfRequests++;
@@ -507,7 +507,7 @@ public class TCPService extends Service {
                     messagesArrived++;
                     for (int i = 0; i < jArr.length(); i++) {
                         if (jArr.getJSONObject(i).getInt("msgid") > result.max("msgid").intValue()) {
-                            insertMessage(realm, jArr.getJSONObject(0).getInt("from"), jArr.getJSONObject(i).getString("msg"), jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(i).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
+                            insertMessage(realm, jArr.getJSONObject(0).getInt("from"), decrypt(jArr.getJSONObject(i).getString("msg")), jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(i).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
                         }
                     }
                     if (messagesArrived == friendList.size()) {
@@ -524,7 +524,7 @@ public class TCPService extends Service {
                 messagesArrived++;
                 for (int i = 0; i < jArr.length(); i++) {
                     if (jArr.getJSONObject(i).getInt("msgid") > result.max("msgid").intValue()) {
-                        insertMessage(realm, jArr.getJSONObject(0).getInt("from"), jArr.getJSONObject(i).getString("msg"), jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(i).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
+                        insertMessage(realm, jArr.getJSONObject(0).getInt("from"), decrypt(jArr.getJSONObject(i).getString("msg")), jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(i).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
                     }
                 }
             } else {
@@ -543,7 +543,7 @@ public class TCPService extends Service {
                         messagesArrived++;
                         for (int i = 0; i < jArr.length(); i++) {
                             if (jArr.getJSONObject(i).getInt("msgid") > result.max("msgid").intValue()) {
-                                insertMessage(realm, jArr.getJSONObject(0).getInt("from"), jArr.getJSONObject(i).getString("msg"), jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(i).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
+                                insertMessage(realm, jArr.getJSONObject(0).getInt("from"), decrypt(jArr.getJSONObject(i).getString("msg")), jArr.getJSONObject(0).getInt("msgid"), jArr.getJSONObject(i).getDouble("t"), jArr.getJSONObject(0).getInt("to"));
                             }
                         }
                     }
@@ -783,11 +783,27 @@ public class TCPService extends Service {
         } else {
             String errorCode = jsonRootObject.get("code").toString();
             switch (errorCode) {
+                case "1":
+                    sendMessage(9111);
+                    break;
+                case "6":
+                    sendMessage(9116);
+                    break;
                 case "21":
                     sendMessage(1121);
                     break;
                 case "2":
                     sendMessage(112);
+                    break;
+                case "20":
+                    Log.d("asdasdsa","10202020s");
+                    sendMessage(20);
+                    break;
+                case "26":
+                    sendMessage(26);
+                    break;
+                case "27":
+                    sendMessage(27);
                     break;
                 case "24" :
                     Realm realm  = Realm.getInstance(this);
@@ -799,7 +815,6 @@ public class TCPService extends Service {
                     realm.commitTransaction();
                     break;
             }
-            Log.d("semi :" + jsonRootObject.get("code").toString() + " ", jsonRootObject.get("error").toString());
         }
 
     }
@@ -967,10 +982,10 @@ public class TCPService extends Service {
      * Bejövő felkérések kezelése.
      * @param jsonArray Szerverüzenetet tartalmazó JSON tömb..
      */
-    public void requestListHandler(JSONArray jsonArray) {
+    private void requestListHandler(JSONArray jsonArray) {
         friendRequests.clear();
         if (jsonArray.length() == 0) {
-            sendedRequests();
+            outgoingRequests();
             return;
         }
         try {
@@ -991,7 +1006,7 @@ public class TCPService extends Service {
      * Kimenő felkérések kezelése.
      * @param jsonArray Szerverüzenetet tartalmazó JSON tömb..
      */
-    public void sendedHandler(JSONArray jsonArray) {
+    private void sendedHandler(JSONArray jsonArray) {
         sendedRequests.clear();
         if (jsonArray.length() == 0) {
             return;
@@ -1014,7 +1029,7 @@ public class TCPService extends Service {
      * Barátlista kezelése.
      * @param jsonArray Szerverüzenetet tartalmazó JSON tömb..
      */
-    public void friendListHandler(JSONArray jsonArray) {
+    private void friendListHandler(JSONArray jsonArray) {
         friendList.clear();
         try {
             if (jsonArray.length() == 0) {
@@ -1160,7 +1175,7 @@ public class TCPService extends Service {
     /**
      *  Kimenő felkérések lekérése a szervertől.
      */
-    public void sendedRequests() {
+    public void outgoingRequests() {
         String msg = "{\"type\":8}";
         byte[] bytes = msg.getBytes();
         try {
@@ -1473,7 +1488,7 @@ public class TCPService extends Service {
      * @return Kódolt üzenet.
      * @throws Exception
      */
-    public String encrypt(String msg) throws Exception {
+    private String encrypt(String msg) throws Exception {
         DESKeySpec keySpec = new DESKeySpec("12345678".getBytes("UTF8"));
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
         SecretKey key = keyFactory.generateSecret(keySpec);
@@ -1494,7 +1509,7 @@ public class TCPService extends Service {
      * @return A visszafejtett üzenet.
      * @throws Exception
      */
-    public String decrypt(String msg) throws Exception {
+    private String decrypt(String msg) throws Exception {
         DESKeySpec keySpec = new DESKeySpec("12345678".getBytes("UTF8"));
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
         SecretKey key = keyFactory.generateSecret(keySpec);

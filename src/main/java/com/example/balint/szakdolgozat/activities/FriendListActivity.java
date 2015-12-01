@@ -148,6 +148,14 @@ public class FriendListActivity extends ActionBarActivity {
                     intent = new Intent(FriendListActivity.this, MessagingActivity.class);
                     startActivity(intent);
                     break;
+                case 9111:
+                    toast = Toast.makeText(FriendListActivity.this, "Nincs ilyen felhasználó", Toast.LENGTH_SHORT);
+                    toast.show();
+                    break;
+                case 9116:
+                    toast = Toast.makeText(FriendListActivity.this, "A felhasználó már szerepel a barátlistán", Toast.LENGTH_SHORT);
+                    toast.show();
+                    break;
             }
         }
     }
@@ -200,7 +208,7 @@ public class FriendListActivity extends ActionBarActivity {
         fla = new FriendListAdapter(this);
 
         Button btn = (Button) findViewById(R.id.frequestB);
-        btn.setOnClickListener(requestB);
+        btn.setOnClickListener(requestA);
 
         Button btn2 = (Button) findViewById(R.id.addFriendB);
         btn2.setOnClickListener(addFriend);
@@ -220,7 +228,7 @@ public class FriendListActivity extends ActionBarActivity {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         if (v.getId() == R.id.usersListView) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-            menu.setHeaderTitle("Menu");
+            menu.setHeaderTitle("Menü");
             switch (currentView) {
                 case 0:
                     menuItems = new String[]{"Barát törlése","Üzenetek törlése"};
@@ -280,7 +288,7 @@ public class FriendListActivity extends ActionBarActivity {
     /**
      * Felkérés lista gomb listener.
      */
-    private View.OnClickListener requestB = new View.OnClickListener() {
+    private View.OnClickListener requestA = new View.OnClickListener() {
         public void onClick(View v) {
             writeRequests();
         }

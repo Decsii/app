@@ -23,7 +23,7 @@
             <com.example.balint.szakdolgozat.javaclasses.RoundedImageView
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:src="@drawable/balazs"
+                android:src="@drawable/defaultpp"
                 android:id="@+id/imageView"/>
         </LinearLayout>
 
@@ -45,7 +45,7 @@
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Notification"
+                android:text="Értesítések"
                 android:textSize="20sp"
                 android:gravity="center_vertical"
                 android:textColor="@color/sinch_purple"
@@ -72,11 +72,11 @@
                 android:layout_height="fill_parent"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/sinch_purple"
-                android:text="Notification sound"
                 android:gravity="center_vertical"
                 android:textSize="20sp"
                 android:id="@+id/textView3"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:text="ÉRtesítési hang" />
 
             <Switch
                 android:layout_width="70dp"
@@ -99,7 +99,7 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/sinch_purple"
                 android:gravity="center_vertical"
-                android:text="Notification vibrate"
+                android:text="Értesítési rezgés"
                 android:textSize="20sp"
                 android:id="@+id/textView4"
                 android:layout_weight="1" />
@@ -124,7 +124,7 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/sinch_purple"
                 android:gravity="center_vertical"
-                android:text="Send with enter"
+                android:text="Küldés enterrel"
                 android:textSize="20sp"
                 android:id="@+id/textView5"
                 android:layout_weight="1" />

@@ -1,8 +1,6 @@
 package com.example.balint.szakdolgozat.javaclasses;
 
 import android.app.Activity;
-import android.graphics.Typeface;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,7 +82,7 @@ public class RequestListAdapter extends BaseAdapter {
                 txtMessage.setText(fli.get(i).getName());
 
                 Button btn = (Button) convertView.findViewById(R.id.racceptB);
-                racceptA = new MyOnClickListener(fli.get(i).getUserid(),fli.get(i).getName()) {
+                racceptA = new OnClickListenerWithID(fli.get(i).getUserid(),fli.get(i).getName()) {
                     public void onClick(View v) {
                         tcps.acceptRequest(this.getUsername());
                     }
@@ -92,7 +90,7 @@ public class RequestListAdapter extends BaseAdapter {
                 btn.setOnClickListener(racceptA);
 
                 Button btn2 = (Button) convertView.findViewById(R.id.rdeclineB);
-                rdeclineA = new MyOnClickListener(fli.get(i).getUserid(),fli.get(i).getName()) {
+                rdeclineA = new OnClickListenerWithID(fli.get(i).getUserid(),fli.get(i).getName()) {
                     public void onClick(View v) {
                         tcps.declineRequest(this.getUsername());
                     }
@@ -108,7 +106,7 @@ public class RequestListAdapter extends BaseAdapter {
                 txtMessage.setText(fli.get(i).getName());
 
                 Button btn3 = (Button) convertView.findViewById(R.id.rundoB);
-                rundorA = new MyOnClickListener(fli.get(i).getUserid(),fli.get(i).getName()) {
+                rundorA = new OnClickListenerWithID(fli.get(i).getUserid(),fli.get(i).getName()) {
                     public void onClick(View v) {
                         tcps.undoRequest(this.getUsername());
                     }

@@ -77,7 +77,7 @@ public class MainActivity extends ActionBarActivity {
                     startActivity(intent);
                     break;
                 case 1121:
-                    toast = Toast.makeText(MainActivity.this, "Hibás felhasználónév/jelszó", Toast.LENGTH_SHORT);
+                    toast = Toast.makeText(MainActivity.this, "Hibás felhasználónév vagy jelszó", Toast.LENGTH_SHORT);
                     toast.show();
                     break;
                 case 112:

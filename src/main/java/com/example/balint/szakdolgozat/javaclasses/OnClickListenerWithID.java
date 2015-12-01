@@ -5,12 +5,12 @@ import android.view.View;
 /**
  * Created by Balint on 2015.11.08..
  */
-public class MyOnClickListener implements View.OnClickListener {
+public class OnClickListenerWithID implements View.OnClickListener {
 
     private int userid;
     private String username;
 
-    public MyOnClickListener(int userid, String username) {
+    public OnClickListenerWithID(int userid, String username) {
         this.userid = userid;
         this.username = username;
     }

@@ -344,9 +344,9 @@ public class MessagingActivity extends ActionBarActivity {
 
     private final Spannable.Factory spannableFactory = Spannable.Factory.getInstance();
     /**
-     * Smileyikat tároló map.
+     * Smiley tároló map.
      */
-    private static final Map<Pattern, Integer> emoticons = new HashMap<Pattern, Integer>();
+    private final Map<Pattern, Integer> emoticons = new HashMap<Pattern, Integer>();
     {
         addPattern(emoticons, ":)", R.drawable.smile_emo);
         addPattern(emoticons, ":D", R.drawable.happy_emo);

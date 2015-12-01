@@ -10,6 +10,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,13 +29,23 @@ public class RegistrationActivity extends ActionBarActivity {
     public class MessageHandler extends Handler {
         @Override
         public void handleMessage(Message message) {
+            Log.d("","messageJOTT");
             int state = message.arg1;
             Intent intent;
-            String uz;
             switch (state) {
                 case 0:
                     intent = new Intent(RegistrationActivity.this, FriendListActivity.class);
                     startActivity(intent);
+                    break;
+                case 20:
+                    Log.d("sd", "2020200");
+                    Toast.makeText(RegistrationActivity.this, "A felhasználónév foglalt", Toast.LENGTH_SHORT).show();
+                    break;
+                case 26:
+                    Toast.makeText(RegistrationActivity.this, "A felhasználónév nem megfelelő", Toast.LENGTH_SHORT).show();
+                    break;
+                case 27:
+                    Toast.makeText(RegistrationActivity.this, "A jelszó nem megfelelő", Toast.LENGTH_SHORT).show();
                     break;
             }
         }
@@ -52,6 +63,9 @@ public class RegistrationActivity extends ActionBarActivity {
             TCPService.LocalBinder binder = (TCPService.LocalBinder) service;
             tcps = binder.getService();
             mBound = true;
+            Intent intent = new Intent(RegistrationActivity.this, TCPService.class);
+            intent.putExtra("MESSENGER", new Messenger(messageHandler));
+            tcps.onBind(intent);
         }
 
         @Override
