@@ -76,7 +76,7 @@
                 android:textSize="20sp"
                 android:id="@+id/textView3"
                 android:layout_weight="1"
-                android:text="ÉRtesítési hang" />
+                android:text="Értesítési hang" />
 
             <Switch
                 android:layout_width="70dp"
@@ -151,7 +151,7 @@
             android:layout_width="fill_parent"
             android:layout_height="55dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Törlöm magam"
+            android:text="Profil törlése"
             android:textSize="22sp"
             android:textColor="@color/sinch_purple"
             android:id="@+id/removeMyself"

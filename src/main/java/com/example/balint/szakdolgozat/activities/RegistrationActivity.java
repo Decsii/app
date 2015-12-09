@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.balint.szakdolgozat.R;
+import com.example.balint.szakdolgozat.javaclasses.TCPService;
 
 
 public class RegistrationActivity extends ActionBarActivity {
@@ -115,7 +116,7 @@ public class RegistrationActivity extends ActionBarActivity {
 
     private View.OnClickListener backA = new View.OnClickListener() {
         public void onClick(View v) {
-            startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
+            startActivity(new Intent(RegistrationActivity.this, LoginActivity.class));
         }
     };
 

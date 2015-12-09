@@ -9,7 +9,6 @@ import android.os.IBinder;
 import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +17,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 import com.example.balint.szakdolgozat.R;
 import com.example.balint.szakdolgozat.javaclasses.Options;
+import com.example.balint.szakdolgozat.javaclasses.TCPService;
+
 import io.realm.Realm;
 import io.realm.RealmResults;
 
@@ -25,7 +26,7 @@ import io.realm.RealmResults;
  * @author      Decsi Bálint
  * @version     1.0
  */
-public class MainActivity extends ActionBarActivity {
+public class LoginActivity extends ActionBarActivity {
     /**
      * Service
      */
@@ -69,19 +70,19 @@ public class MainActivity extends ActionBarActivity {
             Toast toast;
             switch (state) {
                 case 0:
-                    intent = new Intent(MainActivity.this, FriendListActivity.class);
+                    intent = new Intent(LoginActivity.this, FriendListActivity.class);
                     startActivity(intent);
                     break;
                 case 1:
-                    intent = new Intent(MainActivity.this, FriendListActivity.class);
+                    intent = new Intent(LoginActivity.this, FriendListActivity.class);
                     startActivity(intent);
                     break;
                 case 1121:
-                    toast = Toast.makeText(MainActivity.this, "Hibás felhasználónév vagy jelszó", Toast.LENGTH_SHORT);
+                    toast = Toast.makeText(LoginActivity.this, "Hibás felhasználónév vagy jelszó", Toast.LENGTH_SHORT);
                     toast.show();
                     break;
                 case 112:
-                    toast = Toast.makeText(MainActivity.this, "Már be vagy jelentkezve", Toast.LENGTH_SHORT);
+                    toast = Toast.makeText(LoginActivity.this, "Már be vagy jelentkezve", Toast.LENGTH_SHORT);
                     toast.show();
                     break;
             }
@@ -176,12 +177,12 @@ public class MainActivity extends ActionBarActivity {
      * Ha csatlakoztunk a servicehez, akkor fut le.
      */
     private void onServiceReady() {
-        Intent intent = new Intent(MainActivity.this, TCPService.class);
+        Intent intent = new Intent(LoginActivity.this, TCPService.class);
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
 
         if ( tcps.isLogedIn() ){
-            intent = new Intent(MainActivity.this, FriendListActivity.class);
+            intent = new Intent(LoginActivity.this, FriendListActivity.class);
             startActivity(intent);
         }else {
             Realm realm = Realm.getInstance(this);

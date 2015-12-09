@@ -1,4 +1,4 @@
-package com.example.balint.szakdolgozat.activities;
+package com.example.balint.szakdolgozat.javaclasses;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -17,9 +17,7 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.example.balint.szakdolgozat.R;
-import com.example.balint.szakdolgozat.javaclasses.DBMessage;
-import com.example.balint.szakdolgozat.javaclasses.FriendListItem;
-import com.example.balint.szakdolgozat.javaclasses.Options;
+import com.example.balint.szakdolgozat.activities.MessagingActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -307,13 +305,16 @@ public class TCPService extends Service {
                     e.printStackTrace();
                 }
                 while (true) {
+                    Log.d("sztart", "yet");
                     if (stopRefresh) {
                         stopRefresh = false;
                         break;
                     }
-                    if (requestedyet) {
-                        Log.d("sztart", "yet");
+                    if (requestedyet && friendList.size() != 0) {
                         friendS = true;
+                        for(FriendListItem f : friendList){
+                            Log.d("",f.getName());
+                        }
                         userInfoByID(friendList.get(0).getUserid());
                         refresh = true;
                         try {
@@ -324,7 +325,6 @@ public class TCPService extends Service {
                         }
                     } else {
                         try {
-                            //Log.d("not", "yet");
                             Thread.sleep(2000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -395,6 +395,12 @@ public class TCPService extends Service {
         result.remove(0);
         realm.commitTransaction();
         try {
+            friendList.clear();
+            friendRequests.clear();
+            sendedRequests.clear();
+            numOfFriends = 0;
+            numOfRequests = 0;
+            numOfSended = 0;
             refresh = false;
             requestedyet = false;
             logedIn = false;
@@ -700,6 +706,20 @@ public class TCPService extends Service {
         }
     }
 
+    private void autoDeleteHandler(int userid){
+        int ind = 0;
+        while (ind < friendList.size()) {
+            if ( friendList.get(ind).getUserid() == userid ) {
+                break;
+            }
+            ind++;
+        }
+        if ( ind < friendList.size() ){
+            friendList.remove(ind);
+            sendMessage(16);
+        }
+    }
+
     /**
      * Szerver üzenetek feldolgozása.
      * @param jsonString Szervertől olvasott adat.
@@ -778,6 +798,10 @@ public class TCPService extends Service {
                     break;
                 case "22":
                     autoAcceptRequestHandler(jsonRootObject.optJSONObject("userdata"));
+                    break;
+                case "23":
+                    //{"type":23,"userid":23545"}
+                    autoDeleteHandler(jsonRootObject.getInt("userid"));
                     break;
             }
         } else {
@@ -1033,6 +1057,8 @@ public class TCPService extends Service {
         friendList.clear();
         try {
             if (jsonArray.length() == 0) {
+                requestedyet = true;
+                numOfFriends = 1;
                 requests();
                 return;
             }
@@ -1314,7 +1340,6 @@ public class TCPService extends Service {
      */
     public void deleteFriend(String userName) {
         int userid = -1;
-
         int ind = 0;
         while (ind < friendList.size()) {
             if (friendList.get(ind).getName().equals(userName)) {
@@ -1328,9 +1353,7 @@ public class TCPService extends Service {
             Log.d("hiba", "UIhiba");
             return;
         }
-
         friendList.remove(ind);
-
         String msg = "{\"type\":16, \"userid\":" + userid + "}";
         byte[] bytes = msg.getBytes();
         try {
@@ -1421,9 +1444,11 @@ public class TCPService extends Service {
 
         //Date date = new Date(lastActive);
         if (!loggedin) {
+            Log.d("",lastActive + "");
             long currTime = System.currentTimeMillis() / 1000L;
             long time = currTime - lastActive;
-
+            Log.d("asd",currTime + " " + lastActive );
+            Log.d("IDŐŐŐ",time + "");
             if (time >= 2592000) {
                 this.lastActive = "Utoljára bejelentkezve : 30 napnál régebben";
             } else if (time >= 86400) {
@@ -1434,16 +1459,11 @@ public class TCPService extends Service {
                 this.lastActive = "Utoljára bejelentkezve : " + rounded + " órája";
             } else {
                 int rounded = (int) Math.floor(time / 60);
-                this.lastActive = "Utoljára bejelentkezve : " + rounded + " órája";
+                this.lastActive = "Utoljára bejelentkezve : " + rounded + " perce";
             }
         } else {
             this.lastActive = "Éppen aktiv";
         }
-        //Log.d("" + lastActive ,"" + currTime);
-
-        // DateFormat formatter = new SimpleDateFormat("HH:mm");
-        //String dateFormatted = formatter.format(date);
-
         sendMessage(900);
     }
 

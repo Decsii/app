@@ -13,6 +13,7 @@ import android.text.Spannable;
 import android.text.style.ImageSpan;
 import android.util.Log;
 import android.util.Pair;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,11 +22,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.balint.szakdolgozat.javaclasses.DBMessage;
 import com.example.balint.szakdolgozat.javaclasses.FriendListItem;
 import com.example.balint.szakdolgozat.javaclasses.MessageAdapter;
 import com.example.balint.szakdolgozat.R;
+import com.example.balint.szakdolgozat.javaclasses.Options;
+import com.example.balint.szakdolgozat.javaclasses.TCPService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +42,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 
 
-public class MessagingActivity extends ActionBarActivity {
+public class MessagingActivity extends ActionBarActivity{
     /**
      * Service
      */
@@ -83,7 +87,7 @@ public class MessagingActivity extends ActionBarActivity {
             String uz;
             switch (state) {
                 case 2:
-                    intent = new Intent(MessagingActivity.this, MainActivity.class);
+                    intent = new Intent(MessagingActivity.this, LoginActivity.class);
                     startActivity(intent);
                     break;
                 case 11:
@@ -139,10 +143,21 @@ public class MessagingActivity extends ActionBarActivity {
         }
     }
 
+    private boolean swe;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_messaging);
+
+        Realm realm = Realm.getInstance(this);
+        RealmResults<Options> result = realm.where(Options.class)
+                .equalTo("key", "sendwithenter")
+                .findAll();
+        if( result.get(0).getValue().toString().equals("0")  ){
+            swe = false;
+        }else{
+            swe = true;
+        }
 
         messageF = (EditText) findViewById(R.id.messageF);
 
@@ -280,7 +295,7 @@ public class MessagingActivity extends ActionBarActivity {
         tcps.onBind(intent);
 
         if(!tcps.isLogedIn()){
-            intent = new Intent(MessagingActivity.this, MainActivity.class);
+            intent = new Intent(MessagingActivity.this, LoginActivity.class);
             startActivity(intent);
             return;
         }
@@ -390,6 +405,21 @@ public class MessagingActivity extends ActionBarActivity {
         }
         return hasChanges;
     }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent e) {
+        if (e.getAction() == KeyEvent.ACTION_UP) {
+            if (e.getKeyCode() == KeyEvent.KEYCODE_ENTER && swe) {
+                tcps.send(messageF.getText().toString());
+                messageList.add(messageF.getText().toString());
+                Spannable sp = getSmiledText(MessagingActivity.this, messageF.getText());
+                messageAdapter.addMessage(sp, MessageAdapter.DIRECTION_OUTGOING);
+                messageF.setText("");
+                return false;
+            }
+        }
+        return super.dispatchKeyEvent(e);
+    };
 
     /**
      * @return Üzenet a smileyval.

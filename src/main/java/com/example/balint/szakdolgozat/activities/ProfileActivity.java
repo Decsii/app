@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -21,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.balint.szakdolgozat.R;
 import com.example.balint.szakdolgozat.javaclasses.Options;
+import com.example.balint.szakdolgozat.javaclasses.TCPService;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -57,7 +57,7 @@ public class ProfileActivity extends ActionBarActivity {
             String uz;
             switch (state) {
                 case 2:
-                    intent = new Intent(ProfileActivity.this, MainActivity.class);
+                    intent = new Intent(ProfileActivity.this, LoginActivity.class);
                     startActivity(intent);
                     break;
             }
@@ -106,7 +106,7 @@ public class ProfileActivity extends ActionBarActivity {
         public void onClick(View v) {
             Log.d("ASD","ADS");
             tcps.logOut();
-            startActivity(new Intent(ProfileActivity.this, MainActivity.class));
+            startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
         }
     };
 
@@ -116,7 +116,7 @@ public class ProfileActivity extends ActionBarActivity {
     private View.OnClickListener removeMyselfAct = new View.OnClickListener() {
         public void onClick(View v) {
             tcps.removeMyself();
-            startActivity(new Intent(ProfileActivity.this, MainActivity.class));
+            startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
         }
     };
 
@@ -161,7 +161,7 @@ public class ProfileActivity extends ActionBarActivity {
         tcps.onBind(intent);
 
         if(!tcps.isLogedIn()){
-            intent = new Intent(ProfileActivity.this, MainActivity.class);
+            intent = new Intent(ProfileActivity.this, LoginActivity.class);
             startActivity(intent);
             return;
         }

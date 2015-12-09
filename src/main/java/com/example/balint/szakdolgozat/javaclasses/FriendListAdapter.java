@@ -31,7 +31,7 @@ public class FriendListAdapter extends BaseAdapter {
 
     private LayoutInflater layoutInflater;
     private List<FriendListItem> fli;
-    Activity context;
+    public Activity context;
 
     public FriendListAdapter(Activity activity) {
         context = activity;
@@ -45,8 +45,13 @@ public class FriendListAdapter extends BaseAdapter {
     }
 
     public void refreshFriend(Pair<Integer,FriendListItem> pair){
-        fli.set(pair.first,pair.second);
-        notifyDataSetChanged();
+        try {
+            fli.set(pair.first,pair.second);
+            notifyDataSetChanged();
+        }catch( Exception e ){
+            Log.d("","még nem frissült");
+        }
+
     };
 
     public long getLastActive(int i){
@@ -106,12 +111,6 @@ public class FriendListAdapter extends BaseAdapter {
 
         TextView txtMessage3 = (TextView) convertView.findViewById(R.id.timeText);
         txtMessage3.setText(fli.get(i).getTime());
-
-        //if( fli.get(i).getUserid() == 1055 ){
-        //    RoundedImageView p = (RoundedImageView) convertView.findViewById(R.id.imgView);
-        //    Drawable d =  ContextCompat.getDrawable(context, R.drawable.pet);
-        //    p.setImageDrawable(d);
-        //}
 
         return convertView;
     }

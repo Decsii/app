@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.balint.szakdolgozat.R;
-import com.example.balint.szakdolgozat.activities.TCPService;
 
 import java.util.ArrayList;
 import java.util.List;

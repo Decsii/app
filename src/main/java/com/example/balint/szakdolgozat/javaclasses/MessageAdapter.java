@@ -1,9 +1,7 @@
 package com.example.balint.szakdolgozat.javaclasses;
 
 import android.app.Activity;
-import android.content.Context;
 import android.text.Spannable;
-import android.text.style.ImageSpan;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,15 +10,9 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.example.balint.szakdolgozat.R;
-import com.example.balint.szakdolgozat.activities.MainActivity;
-import com.example.balint.szakdolgozat.activities.MessagingActivity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by Balint on 2015.09.06..

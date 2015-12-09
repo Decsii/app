@@ -10,14 +10,11 @@ import android.os.Message;
 import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.util.Pair;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -28,8 +25,8 @@ import com.example.balint.szakdolgozat.javaclasses.DBMessage;
 import com.example.balint.szakdolgozat.javaclasses.FriendListAdapter;
 import com.example.balint.szakdolgozat.javaclasses.FriendListItem;
 import com.example.balint.szakdolgozat.R;
-import com.example.balint.szakdolgozat.javaclasses.Options;
 import com.example.balint.szakdolgozat.javaclasses.RequestListAdapter;
+import com.example.balint.szakdolgozat.javaclasses.TCPService;
 
 import java.util.List;
 
@@ -91,7 +88,7 @@ public class FriendListActivity extends ActionBarActivity {
                     writeFriendList();
                     break;
                 case 2:
-                    intent = new Intent(FriendListActivity.this, MainActivity.class);
+                    intent = new Intent(FriendListActivity.this, LoginActivity.class);
                     startActivity(intent);
                     break;
                 case 4:
@@ -404,7 +401,7 @@ public class FriendListActivity extends ActionBarActivity {
         intent.putExtra("MESSENGER", new Messenger(messageHandler));
         tcps.onBind(intent);
         if(!tcps.isLogedIn()){
-            intent = new Intent(FriendListActivity.this, MainActivity.class);
+            intent = new Intent(FriendListActivity.this, LoginActivity.class);
             startActivity(intent);
             return;
         }
