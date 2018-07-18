@@ -422,3 +422,4 @@ public class FriendListActivity extends ActionBarActivity {
 //simple_commit
 //egy/egy
 //ketto/egy
+//ketto/ketto
