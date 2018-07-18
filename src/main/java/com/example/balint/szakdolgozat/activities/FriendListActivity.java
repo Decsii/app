@@ -412,7 +412,7 @@ public class FriendListActivity extends ActionBarActivity {
         tcps.setCurrentPartner(-1);
         tcps.setFriendListActive(true);
         //Log.d("", "FRIEND REQUEST");
-		//semmi
+		//semmi-2
         if (!tcps.isRequestedyet()) {
             tcps.requestFriendList();
         } else {
