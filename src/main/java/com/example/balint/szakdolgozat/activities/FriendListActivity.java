@@ -420,3 +420,5 @@ public class FriendListActivity extends ActionBarActivity {
         }
     }
 }
+//asd-1-1
+//asd-1-2
