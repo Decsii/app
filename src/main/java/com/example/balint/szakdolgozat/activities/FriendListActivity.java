@@ -40,6 +40,7 @@ import io.realm.RealmResults;
 public class FriendListActivity extends ActionBarActivity {
     /**
      * Serviceeeeeeee
+	 nemtom
      */
     private TCPService tcps;
     /**
