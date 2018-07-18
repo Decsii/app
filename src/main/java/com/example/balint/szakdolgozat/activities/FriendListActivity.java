@@ -412,7 +412,6 @@ public class FriendListActivity extends ActionBarActivity {
         tcps.setCurrentPartner(-1);
         tcps.setFriendListActive(true);
         //Log.d("", "FRIEND REQUEST");
-		//master
         if (!tcps.isRequestedyet()) {
             tcps.requestFriendList();
         } else {
@@ -420,7 +419,3 @@ public class FriendListActivity extends ActionBarActivity {
         }
     }
 }
-//simple_commit
-//egy/egy
-//ketto/egy
-//ketto/ketto
