@@ -419,3 +419,4 @@ public class FriendListActivity extends ActionBarActivity {
         }
     }
 }
+//simple_commit
