@@ -36,10 +36,12 @@ import io.realm.RealmResults;
 /**
  * @author      Decsi Bálint
  */
-//helo - 1
+
 public class FriendListActivity extends ActionBarActivity {
     /**
-     * szervíz
+     * Serviceeeeeeee
+	 nemtom
+>>>>>>> test_2
      */
     private TCPService tcps;
     /**
