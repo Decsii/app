@@ -39,7 +39,7 @@ import io.realm.RealmResults;
 //helo - 1
 public class FriendListActivity extends ActionBarActivity {
     /**
-     * Service
+     * Serviceeeeeeee
      */
     private TCPService tcps;
     /**
