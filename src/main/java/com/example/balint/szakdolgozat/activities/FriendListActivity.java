@@ -37,7 +37,7 @@ import io.realm.RealmResults;
  * @author      Decsi Bálint
  */
 //+1
-//hiba
+//+2
 public class FriendListActivity extends ActionBarActivity {
     /**
      * Serviceeeeeeee
