@@ -412,7 +412,6 @@ public class FriendListActivity extends ActionBarActivity {
         tcps.setCurrentPartner(-1);
         tcps.setFriendListActive(true);
         //Log.d("", "FRIEND REQUEST");
-		//semmi
         if (!tcps.isRequestedyet()) {
             tcps.requestFriendList();
         } else {
@@ -420,5 +419,4 @@ public class FriendListActivity extends ActionBarActivity {
         }
     }
 }
-//a-1-1
-//a-1-2
+//clearmódosítás
