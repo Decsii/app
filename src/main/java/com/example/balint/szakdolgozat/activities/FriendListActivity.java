@@ -38,7 +38,6 @@ import io.realm.RealmResults;
  */
 //+1
 //+2
-//csakugy
 public class FriendListActivity extends ActionBarActivity {
     /**
      * Serviceeeeeeee
