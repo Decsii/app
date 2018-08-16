@@ -394,7 +394,7 @@ public class FriendListActivity extends ActionBarActivity {
      */
     private void refreshFriendItem() {
         fla.refreshFriend(tcps.getRefreshQ().poll());
-    }
+    }fdsafs
 
     /**
      * Ha csatlakoztunk a servicehez, akkor fut le.
