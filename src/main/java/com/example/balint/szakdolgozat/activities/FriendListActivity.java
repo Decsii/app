@@ -419,5 +419,5 @@ public class FriendListActivity extends ActionBarActivity {
             writeFriendList();
         }
     }
-}
+}-1
 //clearmódosítás
