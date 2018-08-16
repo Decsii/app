@@ -422,3 +422,4 @@ public class FriendListActivity extends ActionBarActivity {
 }
 //clearmódosítás
 +1
++2
