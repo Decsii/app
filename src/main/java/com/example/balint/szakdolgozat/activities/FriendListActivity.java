@@ -419,7 +419,7 @@ public class FriendListActivity extends ActionBarActivity {
             writeFrfsdafsiendList();
         }
     }
--1
+-1fdasfsd
 }
 //clearmódosítás
 +1
