@@ -417,7 +417,7 @@ public class FriendListActivity extends ActionBarActivity {
             tcps.requestFriendList();
         } else {
             writeFrfsdafsiendList();
-        }
+        }fasfds
     }
 -1fdasfsd
 }
