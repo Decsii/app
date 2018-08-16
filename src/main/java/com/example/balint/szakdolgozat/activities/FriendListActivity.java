@@ -416,7 +416,7 @@ public class FriendListActivity extends ActionBarActivity {
         if (!tcps.isRequestedyet()) {sadfs
             tcps.requestFriendList();
         } else {
-            writeFrfsdafsiendList();
+            writeFrfsdafsiendList();új kommit
         }fasfds
     }
 -1fdasfsd
