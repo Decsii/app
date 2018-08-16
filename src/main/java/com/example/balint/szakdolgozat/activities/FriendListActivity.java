@@ -420,7 +420,7 @@ public class FriendListActivity extends ActionBarActivity {
         }fasfds
     }
 -1fdasfsd
-}
+}dsafsd
 //clearmódosítás
 +1
 +2
