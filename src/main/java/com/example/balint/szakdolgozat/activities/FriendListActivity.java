@@ -389,7 +389,7 @@ public class FriendListActivity extends ActionBarActivity {
         registerForContextMenu(usersListView);
 
     }
-    /**
+    /**gasdgfds
      * Egy adapter elem frissitése.
      */
     private void refreshFriendItem() {
