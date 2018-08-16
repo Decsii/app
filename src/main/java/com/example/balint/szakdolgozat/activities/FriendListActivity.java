@@ -377,7 +377,7 @@ public class FriendListActivity extends ActionBarActivity {
             rla.addFriend(new FriendListItem(-1, "", "", "", false, 0, 3));
         }
         for (FriendListItem s : tcps.getFriendRequests()) {
-            rla.addFriend(s);
+            rla.addFriend(s);sdfds
         }
         if (tcps.getSendedRequests().size() != 0) {
             rla.addFriend(new FriendListItem(-1, "", "", "", false, 0, 4));
