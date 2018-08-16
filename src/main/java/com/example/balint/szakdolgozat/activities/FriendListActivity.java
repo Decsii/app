@@ -419,5 +419,8 @@ public class FriendListActivity extends ActionBarActivity {
             writeFrfsdafsiendList();
         }
     }
-}-1
+-1
+}
 //clearmódosítás
++1
++2
