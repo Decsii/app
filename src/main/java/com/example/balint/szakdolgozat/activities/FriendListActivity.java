@@ -32,7 +32,7 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-
+fsadfsd
 /**
  * @author      Decsi Bálint
  */
