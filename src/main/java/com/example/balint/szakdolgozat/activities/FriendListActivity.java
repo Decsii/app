@@ -18,20 +18,15 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
+impofrt android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.balint.szakdolgozat.javaclasses.DBMessage;
 import com.example.balint.szakdolgozat.javaclasses.FriendListAdapter;
-import com.example.balint.szakdolgozat.javaclasses.FriendListItem;
-import com.example.balint.szakdolgozat.R;
-import com.example.balint.szakdolgozat.javaclasses.RequestListAdapter;
-import com.example.balint.szakdolgozat.javaclasses.TCPService;
-
-import java.util.List;
+import com.example.balint.szakdolgozat.javaclfasdf
 
 import io.realm.Realm;
-import io.realm.RealmResults;
+import io.realm.RealmResults;asdf
 
 /**
  * @author      Decsi Bálint
