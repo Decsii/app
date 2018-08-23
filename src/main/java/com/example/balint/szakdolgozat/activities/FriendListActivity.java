@@ -21,12 +21,12 @@ import android.widget.LinearLayout;
 impofrt android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.balint.szakdolgozat.javaclasses.DBMessage;
+import com.example.balint.szakdolgozat.javaclasses.DBMessage;fasdfdsfsd
 import com.example.balint.szakdolgozat.javaclasses.FriendListAdapter;
 import com.example.balint.szakdolgozat.javaclfasdf
 
 import io.realm.Realm;
-import io.realm.RealmResults;asdf
+import io.realm.RealmResults;asdfdfdasf
 
 /**
  * @author      Decsi Bálint
